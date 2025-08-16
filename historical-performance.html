@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>過去実績確認</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .back-btn {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #2980b9;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .search-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            margin-right: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
+        .results-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .results-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+        
+        .summary-card h3 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-card p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .trend-up {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .trend-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .trend-stable {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .chart-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+        
+        .filter-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tag {
+            background: #3498db;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .filter-tag .close {
+            cursor: pointer;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom-color: #3498db;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .tab:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📈 過去実績確認</h1>
+        <a href="index.html" class="back-btn">← メインメニュー</a>
+    </div>
+    
+    <div class="container">
+        <!-- 検索・フィルター -->
+        <div class="search-panel">
+            <h2>🔍 検索条件</h2>
+            <div class="search-grid">
+                <div class="form-group">
+                    <label>期間（開始）</label>
+                    <input type="date" value="2024-01-01">
+                </div>
+                <div class="form-group">
+                    <label>期間（終了）</label>
+                    <input type="date" value="2024-01-15">
+                </div>
+                <div class="form-group">
+                    <label>店舗</label>
+                    <select>
+                        <option>全店舗</option>
+                        <option>本店</option>
+                        <option>支店A</option>
+                        <option>支店B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>商品カテゴリ</label>
+                    <select>
+                        <option>全カテゴリ</option>
+                        <option>洋菓子</option>
+                        <option>和菓子</option>
+                        <option>パン類</option>
+                        <option>季節商品</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>商品名</label>
+                    <input type="text" placeholder="商品名で検索">
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <button class="btn btn-primary">🔍 検索実行</button>
+                </div>
+            </div>
+            
+            <div class="filter-tags">
+                <div class="filter-tag">
+                    期間: 2024/01/01 - 2024/01/15
+                    <span class="close">×</span>
+                </div>
+                <div class="filter-tag">
+                    店舗: 全店舗
+                    <span class="close">×</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- タブ切り替え -->
+        <div class="tabs">
+            <div class="tab active">📊 売上サマリー</div>
+            <div class="tab">📋 詳細データ</div>
+            <div class="tab">📈 トレンド分析</div>
+            <div class="tab">📉 比較分析</div>
+        </div>
+        
+        <!-- サマリー情報 -->
+        <div class="results-section">
+            <h2>📊 期間サマリー（2024/01/01 - 2024/01/15）</h2>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>¥18,450,000</h3>
+                    <p>総売上額</p>
+                    <div class="trend-indicator trend-up">↗ +12.3%</div>
+                </div>
+                <div class="summary-card">
+                    <h3>12,580</h3>
+                    <p>販売個数</p>
+                    <div class="trend-indicator trend-up">↗ +8.7%</div>
+                </div>
+                <div class="summary-card">
+                    <h3>¥1,467</h3>
+                    <p>平均単価</p>
+                    <div class="trend-indicator trend-up">↗ +3.2%</div>
+                </div>
+                <div class="summary-card">
+                    <h3>6.8%</h3>
+                    <p>廃棄率</p>
+                    <div class="trend-indicator trend-down">↘ -1.2%</div>
+                </div>
+                <div class="summary-card">
+                    <h3>92.3%</h3>
+                    <p>在庫充足率</p>
+                    <div class="trend-indicator trend-up">↗ +2.8%</div>
+                </div>
+                <div class="summary-card">
+                    <h3>34.2%</h3>
+                    <p>粗利率</p>
+                    <div class="trend-indicator trend-stable">→ ±0.1%</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- グラフ表示エリア -->
+        <div class="results-section">
+            <h2>📈 売上推移グラフ</h2>
+            <div class="chart-placeholder">
+                📊 売上推移チャートが表示されます<br>
+                （実装時にChart.jsやD3.jsなどのライブラリを使用）
+            </div>
+            <button class="btn btn-primary">📊 グラフ設定</button>
+            <button class="btn btn-success">💾 グラフ保存</button>
+        </div>
+        
+        <!-- 詳細データテーブル -->
+        <div class="results-section">
+            <h2>📋 商品別実績詳細</h2>
+            <div style="margin-bottom: 1rem;">
+                <button class="btn btn-success">📁 CSV出力</button>
+                <button class="btn btn-primary">📧 レポート送信</button>
+                <button class="btn btn-primary">🖨️ 印刷</button>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>日付</th>
+                            <th>商品コード</th>
+                            <th>商品名</th>
+                            <th>店舗</th>
+                            <th>販売数量</th>
+                            <th>売上額</th>
+                            <th>単価</th>
+                            <th>仕入数量</th>
+                            <th>廃棄数量</th>
+                            <th>廃棄率</th>
+                            <th>在庫</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2024-01-15</td>
+                            <td>YS001</td>
+                            <td>ショートケーキ</td>
+                            <td>本店</td>
+                            <td>35</td>
+                            <td>¥13,300</td>
+                            <td>¥380</td>
+                            <td>40</td>
+                            <td>2</td>
+                            <td>5.0%</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15</td>
+                            <td>YS002</td>
+                            <td>チーズケーキ</td>
+                            <td>本店</td>
+                            <td>28</td>
+                            <td>¥11,760</td>
+                            <td>¥420</td>
+                            <td>30</td>
+                            <td>1</td>
+                            <td>3.3%</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15</td>
+                            <td>YS003</td>
+                            <td>フルーツタルト</td>
+                            <td>本店</td>
+                            <td>22</td>
+                            <td>¥12,760</td>
+                            <td>¥580</td>
+                            <td>25</td>
+                            <td>2</td>
+                            <td>8.0%</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15</td>
+                            <td>YS004</td>
+                            <td>チョコレートケーキ</td>
+                            <td>本店</td>
+                            <td>31</td>
+                            <td>¥15,500</td>
+                            <td>¥500</td>
+                            <td>35</td>
+                            <td>3</td>
+                            <td>8.6%</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-15</td>
+                            <td>YS005</td>
+                            <td>モンブラン</td>
+                            <td>本店</td>
+                            <td>18</td>
+                            <td>¥10,800</td>
+                            <td>¥600</td>
+                            <td>20</td>
+                            <td>1</td>
+                            <td>5.0%</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-14</td>
+                            <td>YS001</td>
+                            <td>ショートケーキ</td>
+                            <td>本店</td>
+                            <td>42</td>
+                            <td>¥15,960</td>
+                            <td>¥380</td>
+                            <td>45</td>
+                            <td>1</td>
+                            <td>2.2%</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-14</td>
+                            <td>YS002</td>
+                            <td>チーズケーキ</td>
+                            <td>本店</td>
+                            <td>33</td>
+                            <td>¥13,860</td>
+                            <td>¥420</td>
+                            <td>35</td>
+                            <td>0</td>
+                            <td>0.0%</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-14</td>
+                            <td>YS003</td>
+                            <td>フルーツタルト</td>
+                            <td>本店</td>
+                            <td>19</td>
+                            <td>¥11,020</td>
+                            <td>¥580</td>
+                            <td>22</td>
+                            <td>2</td>
+                            <td>9.1%</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 比較分析 -->
+        <div class="results-section">
+            <h2>📉 前年同期比較</h2>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>+15.8%</h3>
+                    <p>売上成長率</p>
+                    <div class="trend-indicator trend-up">前年同期比</div>
+                </div>
+                <div class="summary-card">
+                    <h3>+12.3%</h3>
+                    <p>数量成長率</p>
+                    <div class="trend-indicator trend-up">前年同期比</div>
+                </div>
+                <div class="summary-card">
+                    <h3>+3.1%</h3>
+                    <p>単価上昇率</p>
+                    <div class="trend-indicator trend-up">前年同期比</div>
+                </div>
+                <div class="summary-card">
+                    <h3>-2.1%</h3>
+                    <p>廃棄率改善</p>
+                    <div class="trend-indicator trend-down">前年同期比</div>
+                </div>
+            </div>
+            
+            <div class="chart-placeholder">
+                📊 前年同期比較チャートが表示されます
+            </div>
+        </div>
+    </div>
+</body>
+</html>

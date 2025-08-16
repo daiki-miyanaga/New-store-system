@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在庫管理システム - メイン</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .user-info {
+            font-size: 0.9rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .nav-card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+        
+        .nav-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .nav-card p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .quick-stats {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        
+        .quick-stats h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: #ecf0f1;
+            border-radius: 6px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏪 在庫管理システム</h1>
+        <div class="user-info">
+            <span>ユーザー: 管理者 | 最終ログイン: 2024-01-15 14:30</span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="nav-cards">
+            <a href="performance-input.html" class="nav-card">
+                <div class="nav-card-icon">📊</div>
+                <h2>洋生実績入力＆短日ノート</h2>
+                <p>日々の売上実績を入力し、短期間での分析メモを記録できます</p>
+            </a>
+            
+            <a href="order-simulation.html" class="nav-card">
+                <div class="nav-card-icon">🔄</div>
+                <h2>発注修正シミュレーション</h2>
+                <p>発注数量を調整し、その影響をシミュレーションで確認できます</p>
+            </a>
+            
+            <a href="historical-performance.html" class="nav-card">
+                <div class="nav-card-icon">📈</div>
+                <h2>過去実績確認</h2>
+                <p>指定期間の売上・在庫データを詳細に分析・確認できます</p>
+            </a>
+        </div>
+        
+        <div class="quick-stats">
+            <h3>📋 今日のクイック統計</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">¥1,234,567</div>
+                    <div class="stat-label">本日売上</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">在庫充足率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">23</div>
+                    <div class="stat-label">要発注商品</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">新着通知</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

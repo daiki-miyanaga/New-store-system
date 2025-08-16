@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洋生実績入力＆短日ノート</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .back-btn {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #2980b9;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
+        .note-section {
+            margin-top: 2rem;
+        }
+        
+        .note-item {
+            background: #fff9c4;
+            border-left: 4px solid #f39c12;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .note-date {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quick-input {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .quick-input input {
+            padding: 0.5rem;
+            border: 1px solid #27ae60;
+            border-radius: 4px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        
+        .hourly-sales {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .hourly-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hourly-input label {
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+            color: #2c3e50;
+        }
+        
+        .hourly-input input {
+            width: 60px;
+            padding: 0.3rem;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 洋生実績入力＆短日ノート</h1>
+        <a href="index.html" class="back-btn">← メインメニュー</a>
+    </div>
+    
+    <div class="container">
+        <!-- クイック入力セクション -->
+        <div class="form-section">
+            <h2>⚡ クイック実績入力</h2>
+            <div class="quick-input">
+                <div class="quick-input-grid">
+                    <div class="form-group">
+                        <label>日付</label>
+                        <input type="date" value="2024-01-15">
+                    </div>
+                    <div class="form-group">
+                        <label>商品コード</label>
+                        <input type="text" placeholder="例: YS001">
+                    </div>
+                    <div class="form-group">
+                        <label>売上数量</label>
+                        <input type="number" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>単価</label>
+                        <input type="number" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label></label>
+                        <button class="btn btn-success">追加</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 詳細入力セクション -->
+        <div class="form-section">
+            <h2>📝 詳細実績入力</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>入力日付</label>
+                    <input type="date" value="2024-01-15">
+                </div>
+                <div class="form-group">
+                    <label>店舗選択</label>
+                    <select>
+                        <option>本店</option>
+                        <option>支店A</option>
+                        <option>支店B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>商品カテゴリ</label>
+                    <select>
+                        <option>洋菓子</option>
+                        <option>和菓子</option>
+                        <option>パン類</option>
+                        <option>季節商品</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>商品名</label>
+                    <input type="text" placeholder="商品名を入力">
+                </div>
+                <div class="form-group">
+                    <label>商品コード</label>
+                    <input type="text" placeholder="例: YS001">
+                </div>
+                <div class="form-group">
+                    <label>前日残</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>移動</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>当日在庫</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>売上数量</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>ロス</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>閉店時在庫</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>特注</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>完売時間</label>
+                    <input type="time" placeholder="--:--">
+                </div>
+                <div class="form-group">
+                    <label>販売単価（円）</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>仕入単価（円）</label>
+                    <input type="number" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>天候</label>
+                    <select>
+                        <option>晴れ</option>
+                        <option>曇り</option>
+                        <option>雨</option>
+                        <option>雪</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>特記事項</label>
+                    <select>
+                        <option>通常営業</option>
+                        <option>イベント開催</option>
+                        <option>セール実施</option>
+                        <option>新商品発売</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 時間別売上入力 -->
+        <div class="form-section">
+            <h2>🕐 時間別売上入力（全体売上額）</h2>
+            <div class="hourly-sales">
+                <div class="hourly-input">
+                    <label>9時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>10時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>11時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>12時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>13時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>14時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>15時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>16時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>17時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>18時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>19時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+                <div class="hourly-input">
+                    <label>20時</label>
+                    <input type="number" placeholder="売上額">
+                </div>
+            </div>
+            <button class="btn btn-success" style="margin-top: 1rem;">💾 時間別データ保存</button>
+        </div>
+        
+        <!-- 本日の入力実績 -->
+        <div class="form-section">
+            <h2>📋 本日の入力実績</h2>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>商品コード</th>
+                            <th>商品名</th>
+                            <th>前日残</th>
+                            <th>移動</th>
+                            <th>当日在庫</th>
+                            <th>売上数量</th>
+                            <th>ロス</th>
+                            <th>閉店時在庫</th>
+                            <th>特注</th>
+                            <th>完売時間</th>
+                            <th>単価</th>
+                            <th>売上額</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>YS001</td>
+                            <td>ショートケーキ</td>
+                            <td>8</td>
+                            <td>0</td>
+                            <td>43</td>
+                            <td>35</td>
+                            <td>2</td>
+                            <td>6</td>
+                            <td>3</td>
+                            <td>18:30</td>
+                            <td>¥380</td>
+                            <td>¥13,300</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
+                        </tr>
+                        <tr>
+                            <td>YS002</td>
+                            <td>チーズケーキ</td>
+                            <td>5</td>
+                            <td>2</td>
+                            <td>32</td>
+                            <td>28</td>
+                            <td>1</td>
+                            <td>3</td>
+                            <td>1</td>
+                            <td>19:15</td>
+                            <td>¥420</td>
+                            <td>¥11,760</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
+                        </tr>
+                        <tr>
+                            <td>YS003</td>
+                            <td>フルーツタルト</td>
+                            <td>3</td>
+                            <td>0</td>
+                            <td>25</td>
+                            <td>22</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>完売</td>
+                            <td>¥580</td>
+                            <td>¥12,760</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
+                        </tr>
+                        <tr>
+                            <td>YS004</td>
+                            <td>チョコレートケーキ</td>
+                            <td>6</td>
+                            <td>1</td>
+                            <td>36</td>
+                            <td>31</td>
+                            <td>3</td>
+                            <td>2</td>
+                            <td>2</td>
+                            <td>19:45</td>
+                            <td>¥500</td>
+                            <td>¥15,500</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
+                        </tr>
+                        <tr>
+                            <td>YS005</td>
+                            <td>モンブラン</td>
+                            <td>2</td>
+                            <td>0</td>
+                            <td>20</td>
+                            <td>18</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>18:00</td>
+                            <td>¥600</td>
+                            <td>¥10,800</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 短日ノート -->
+        <div class="form-section">
+            <h2>📖 短日ノート</h2>
+            <div class="form-group">
+                <label>今日のメモ・気づき</label>
+                <textarea placeholder="本日の売上状況、客層の変化、商品の動向など、気づいたことを記録してください"></textarea>
+            </div>
+            
+            <div class="note-section">
+                <h3>過去のノート</h3>
+                <div class="note-item">
+                    <div class="note-date">2024-01-14 16:30</div>
+                    <div>午後からの雨で客足が減少。ショートケーキの売れ行きが好調で、予定より2時間早く完売。明日は多めに準備を検討。</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-date">2024-01-13 17:45</div>
+                    <div>新商品のフルーツタルトが好評。特に女性客からの反応が良い。週末に向けて在庫を増やす方向で検討。</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-success">💾 データを保存</button>
+            <button class="btn btn-primary">📊 日報を生成</button>
+            <button class="btn btn-primary">📈 グラフ表示</button>
+        </div>
+    </div>
+</body>
+</html>

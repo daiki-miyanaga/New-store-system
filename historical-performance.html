@@ -299,27 +299,48 @@
                     <input type="date" value="2024-01-15">
                 </div>
                 <div class="form-group">
-                    <label>店舗</label>
+                    <label>商品コード</label>
+                    <input type="text" placeholder="例: YS001">
+                </div>
+                <div class="form-group">
+                    <label>商品カテゴリ</label>
                     <select>
-                        <option>全店舗</option>
+                        <option>全カテゴリ</option>
+                        <option>ケーキ</option>
+                        <option>プリン</option>
+                        <option>ゼリー</option>
+                        <option>季節商品</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>得意先</label>
+                    <select>
+                        <option>全得意先</option>
                         <option>本店</option>
                         <option>支店A</option>
                         <option>支店B</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>商品カテゴリ</label>
+                    <label>特注有無</label>
                     <select>
-                        <option>全カテゴリ</option>
-                        <option>洋菓子</option>
-                        <option>和菓子</option>
-                        <option>パン類</option>
-                        <option>季節商品</option>
+                        <option>全て</option>
+                        <option>特注あり</option>
+                        <option>特注なし</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>商品名</label>
-                    <input type="text" placeholder="商品名で検索">
+                    <label>完売日数しきい値</label>
+                    <input type="number" placeholder="3" value="3">
+                </div>
+                <div class="form-group">
+                    <label>前年気温条件</label>
+                    <select>
+                        <option>指定なし</option>
+                        <option>同気温帯(±3℃)</option>
+                        <option>高気温時(+5℃以上)</option>
+                        <option>低気温時(-5℃以下)</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label></label>

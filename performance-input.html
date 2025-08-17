@@ -263,16 +263,16 @@
             </div>
         </div>
         
-        <!-- 詳細入力セクション -->
+        <!-- ヘッダ情報 -->
         <div class="form-section">
-            <h2>📝 詳細実績入力</h2>
+            <h2>📅 日次情報設定</h2>
             <div class="form-grid">
                 <div class="form-group">
-                    <label>入力日付</label>
+                    <label>日付</label>
                     <input type="date" value="2024-01-15">
                 </div>
                 <div class="form-group">
-                    <label>店舗選択</label>
+                    <label>店舗</label>
                     <select>
                         <option>本店</option>
                         <option>支店A</option>
@@ -280,64 +280,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>商品カテゴリ</label>
-                    <select>
-                        <option>洋菓子</option>
-                        <option>和菓子</option>
-                        <option>パン類</option>
-                        <option>季節商品</option>
-                    </select>
+                    <label>客数</label>
+                    <input type="number" placeholder="60" value="60">
                 </div>
                 <div class="form-group">
-                    <label>商品名</label>
-                    <input type="text" placeholder="商品名を入力">
-                </div>
-                <div class="form-group">
-                    <label>商品コード</label>
-                    <input type="text" placeholder="例: YS001">
-                </div>
-                <div class="form-group">
-                    <label>前日残</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>移動</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>当日在庫</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>売上数量</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>ロス</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>閉店時在庫</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>特注</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>完売時間</label>
-                    <input type="time" placeholder="--:--">
-                </div>
-                <div class="form-group">
-                    <label>販売単価（円）</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>仕入単価（円）</label>
-                    <input type="number" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>天候</label>
+                    <label>天気</label>
                     <select>
                         <option>晴れ</option>
                         <option>曇り</option>
@@ -346,173 +293,181 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>特記事項</label>
+                    <label>気温（℃）</label>
+                    <input type="number" placeholder="15" value="15">
+                </div>
+                <div class="form-group">
+                    <label>特招会・イベント</label>
                     <select>
-                        <option>通常営業</option>
-                        <option>イベント開催</option>
-                        <option>セール実施</option>
+                        <option>なし</option>
+                        <option>特招会</option>
+                        <option>セール</option>
                         <option>新商品発売</option>
+                        <option>競合催事</option>
                     </select>
                 </div>
             </div>
         </div>
         
-        <!-- 時間別売上入力 -->
+        <!-- 商品別実績入力グリッド -->
         <div class="form-section">
-            <h2>🕐 時間別売上入力（全体売上額）</h2>
-            <div class="hourly-sales">
-                <div class="hourly-input">
-                    <label>9時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>10時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>11時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>12時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>13時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>14時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>15時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>16時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>17時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>18時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>19時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
-                <div class="hourly-input">
-                    <label>20時</label>
-                    <input type="number" placeholder="売上額">
-                </div>
+            <h2>📝 商品別実績入力</h2>
+            <div style="margin-bottom: 1rem;">
+                <button class="btn btn-success">➕ 商品追加</button>
+                <button class="btn btn-primary">📋 テンプレート適用</button>
+                <button class="btn btn-primary">🔄 自動計算</button>
             </div>
-            <button class="btn btn-success" style="margin-top: 1rem;">💾 時間別データ保存</button>
-        </div>
-        
-        <!-- 本日の入力実績 -->
-        <div class="form-section">
-            <h2>📋 本日の入力実績</h2>
             <div class="table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>商品コード</th>
                             <th>商品名</th>
+                            <th>単価</th>
+                            <th>カテゴリ</th>
                             <th>前日残</th>
+                            <th>製造数</th>
                             <th>移動</th>
-                            <th>当日在庫</th>
-                            <th>売上数量</th>
-                            <th>ロス</th>
+                            <th>販売数</th>
+                            <th>ロス数</th>
+                            <th>当日在庫<br><small>(自動)</small></th>
                             <th>閉店時在庫</th>
                             <th>特注</th>
                             <th>完売時間</th>
-                            <th>単価</th>
                             <th>売上額</th>
+                            <th>構成比</th>
                             <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>YS001</td>
-                            <td>ショートケーキ</td>
-                            <td>8</td>
-                            <td>0</td>
-                            <td>43</td>
-                            <td>35</td>
-                            <td>2</td>
-                            <td>6</td>
-                            <td>3</td>
-                            <td>18:30</td>
-                            <td>¥380</td>
-                            <td>¥13,300</td>
-                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
+                            <td><input type="text" style="width: 80px;" value="YS001"></td>
+                            <td><input type="text" style="width: 120px;" value="ショートケーキ"></td>
+                            <td><input type="number" style="width: 80px;" value="380"></td>
+                            <td>
+                                <select style="width: 80px;">
+                                    <option>ケーキ</option>
+                                    <option>プリン</option>
+                                    <option>ゼリー</option>
+                                </select>
+                            </td>
+                            <td><input type="number" style="width: 60px;" value="8"></td>
+                            <td><input type="number" style="width: 60px;" value="35"></td>
+                            <td><input type="number" style="width: 60px;" value="0"></td>
+                            <td><input type="number" style="width: 60px;" value="35"></td>
+                            <td><input type="number" style="width: 60px;" value="2"></td>
+                            <td style="background: #f0f0f0;">6</td>
+                            <td><input type="number" style="width: 60px;" value="6"></td>
+                            <td><input type="number" style="width: 60px;" value="3"></td>
+                            <td><input type="time" style="width: 80px;" value="18:30"></td>
+                            <td style="background: #f0f0f0;">¥13,300</td>
+                            <td style="background: #f0f0f0;">22.1%</td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">複製</button>
+                                <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button>
+                            </td>
                         </tr>
                         <tr>
-                            <td>YS002</td>
-                            <td>チーズケーキ</td>
-                            <td>5</td>
-                            <td>2</td>
-                            <td>32</td>
-                            <td>28</td>
-                            <td>1</td>
-                            <td>3</td>
-                            <td>1</td>
-                            <td>19:15</td>
-                            <td>¥420</td>
-                            <td>¥11,760</td>
-                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
-                        </tr>
-                        <tr>
-                            <td>YS003</td>
-                            <td>フルーツタルト</td>
-                            <td>3</td>
-                            <td>0</td>
-                            <td>25</td>
-                            <td>22</td>
-                            <td>2</td>
-                            <td>1</td>
-                            <td>0</td>
-                            <td>完売</td>
-                            <td>¥580</td>
-                            <td>¥12,760</td>
-                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
-                        </tr>
-                        <tr>
-                            <td>YS004</td>
-                            <td>チョコレートケーキ</td>
-                            <td>6</td>
-                            <td>1</td>
-                            <td>36</td>
-                            <td>31</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>2</td>
-                            <td>19:45</td>
-                            <td>¥500</td>
-                            <td>¥15,500</td>
-                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
-                        </tr>
-                        <tr>
-                            <td>YS005</td>
-                            <td>モンブラン</td>
-                            <td>2</td>
-                            <td>0</td>
-                            <td>20</td>
-                            <td>18</td>
-                            <td>1</td>
-                            <td>1</td>
-                            <td>1</td>
-                            <td>18:00</td>
-                            <td>¥600</td>
-                            <td>¥10,800</td>
-                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">編集</button></td>
+                            <td><input type="text" style="width: 80px;" value="YS002"></td>
+                            <td><input type="text" style="width: 120px;" value="チーズケーキ"></td>
+                            <td><input type="number" style="width: 80px;" value="420"></td>
+                            <td>
+                                <select style="width: 80px;">
+                                    <option>ケーキ</option>
+                                    <option>プリン</option>
+                                    <option>ゼリー</option>
+                                </select>
+                            </td>
+                            <td><input type="number" style="width: 60px;" value="5"></td>
+                            <td><input type="number" style="width: 60px;" value="25"></td>
+                            <td><input type="number" style="width: 60px;" value="2"></td>
+                            <td><input type="number" style="width: 60px;" value="28"></td>
+                            <td><input type="number" style="width: 60px;" value="1"></td>
+                            <td style="background: #f0f0f0;">3</td>
+                            <td><input type="number" style="width: 60px;" value="3"></td>
+                            <td><input type="number" style="width: 60px;" value="1"></td>
+                            <td><input type="time" style="width: 80px;" value="19:15"></td>
+                            <td style="background: #f0f0f0;">¥11,760</td>
+                            <td style="background: #f0f0f0;">19.5%</td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">複製</button>
+                                <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <strong>合計情報:</strong> 売上額: ¥60,280 | 総販売数: 134個 | 総ロス数: 8個 | ロス率: 5.6%
+            </div>
+        </div>
+        
+        <!-- 時間帯別売上 -->
+        <div class="form-section">
+            <h2>🕐 時間帯別売上入力</h2>
+            <div style="margin-bottom: 1rem;">
+                <button class="btn btn-success">➕ 時間追加</button>
+                <button class="btn btn-primary">📈 グラフ表示</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>時間</th>
+                            <th>売上額</th>
+                            <th>構成比</th>
+                            <th>累計</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09:00-10:00</td>
+                            <td><input type="number" style="width: 100px;" placeholder="売上額" value="3200"></td>
+                            <td style="background: #f0f0f0;">5.3%</td>
+                            <td style="background: #f0f0f0;">¥3,200</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td>10:00-11:00</td>
+                            <td><input type="number" style="width: 100px;" placeholder="売上額" value="4800"></td>
+                            <td style="background: #f0f0f0;">8.0%</td>
+                            <td style="background: #f0f0f0;">¥8,000</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td>11:00-12:00</td>
+                            <td><input type="number" style="width: 100px;" placeholder="売上額" value="7200"></td>
+                            <td style="background: #f0f0f0;">12.0%</td>
+                            <td style="background: #f0f0f0;">¥15,200</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button></td>
+                        </tr>
+                        <tr>
+                            <td>14:00-15:00</td>
+                            <td><input type="number" style="width: 100px;" placeholder="売上額" value="9600"></td>
+                            <td style="background: #f0f0f0;">16.0%</td>
+                            <td style="background: #f0f0f0;">¥24,800</td>
+                            <td><button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <strong>時間帯合計:</strong> ¥60,280 | ピーク時間: 14:00-15:00 (¥9,600)
+            </div>
+        </div>
+        
+        <!-- バリデーションアラート -->
+        <div class="form-section">
+            <h2>⚠️ アラート・注意事項</h2>
+            <div style="display: grid; gap: 1rem;">
+                <div class="alert alert-warning">
+                    <strong>ロス率警告:</strong> フルーツタルトのロス率が8.0%で、基準値(5%)を超えています。
+                </div>
+                <div class="alert alert-info">
+                    <strong>完売時間未入力:</strong> 3商品の完売時間が未入力です。入力をお願いします。
+                </div>
             </div>
         </div>
         

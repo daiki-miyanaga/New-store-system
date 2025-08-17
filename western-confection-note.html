@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洋生ノート</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .back-btn {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #2980b9;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .filter-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
+        .main-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 300px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .column-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+        
+        .column-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        
+        .field-group {
+            margin-bottom: 1rem;
+        }
+        
+        .field-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .field-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .readonly-field {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .hourly-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        
+        .hourly-table th,
+        .hourly-table td {
+            padding: 0.3rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .hourly-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .hourly-table input {
+            width: 100%;
+            border: none;
+            padding: 0.2rem;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .summary-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .summary-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+        
+        .summary-card h4 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+        }
+        
+        .summary-card p {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+        }
+        
+        .memo-section {
+            background: #fff9c4;
+            border: 1px solid #f39c12;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .memo-section h4 {
+            color: #e67e22;
+            margin-bottom: 0.5rem;
+        }
+        
+        .alert {
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #17a2b8;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧁 洋生ノート</h1>
+        <a href="index.html" class="back-btn">← メインメニュー</a>
+    </div>
+    
+    <div class="container">
+        <!-- フィルター・検索 -->
+        <div class="filter-section">
+            <h2>🔍 抽出条件</h2>
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label>期間（開始）</label>
+                    <input type="date" value="2024-01-15">
+                </div>
+                <div class="form-group">
+                    <label>期間（終了）</label>
+                    <input type="date" value="2024-01-15">
+                </div>
+                <div class="form-group">
+                    <label>得意先コード</label>
+                    <input type="text" placeholder="例: C001">
+                </div>
+                <div class="form-group">
+                    <label>商品コード</label>
+                    <input type="text" placeholder="例: YS001">
+                </div>
+                <div class="form-group">
+                    <label>商品カテゴリ</label>
+                    <select>
+                        <option>全カテゴリ</option>
+                        <option>ケーキ</option>
+                        <option>プリン</option>
+                        <option>ゼリー</option>
+                        <option>季節商品</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <button class="btn btn-primary">🔍 抽出実行</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 3カラム構成メインパネル -->
+        <div class="main-panel">
+            <!-- 基本情報カラム -->
+            <div class="column-section">
+                <h3>📋 基本情報</h3>
+                
+                <div class="field-group">
+                    <label>日付</label>
+                    <input type="date" value="2024-01-15">
+                </div>
+                
+                <div class="field-group">
+                    <label>得意先コード</label>
+                    <input type="text" value="C001">
+                </div>
+                
+                <div class="field-group">
+                    <label>商品コード</label>
+                    <input type="text" value="YS001">
+                </div>
+                
+                <div class="field-group">
+                    <label>商品名</label>
+                    <input type="text" value="ショートケーキ">
+                </div>
+                
+                <div class="field-group">
+                    <label>単価（円）</label>
+                    <input type="number" value="380">
+                </div>
+                
+                <div class="field-group">
+                    <label>カテゴリ</label>
+                    <select>
+                        <option>ケーキ</option>
+                        <option>プリン</option>
+                        <option>ゼリー</option>
+                        <option>季節商品</option>
+                    </select>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>商品情報:</strong> 洋生菓子カテゴリの主力商品です。
+                </div>
+            </div>
+            
+            <!-- 在庫情報カラム -->
+            <div class="column-section">
+                <h3>📦 在庫情報</h3>
+                
+                <div class="field-group">
+                    <label>前日残</label>
+                    <input type="number" value="8">
+                </div>
+                
+                <div class="field-group">
+                    <label>製造数</label>
+                    <input type="number" value="35">
+                </div>
+                
+                <div class="field-group">
+                    <label>販売数</label>
+                    <input type="number" value="35">
+                </div>
+                
+                <div class="field-group">
+                    <label>ロス数</label>
+                    <input type="number" value="2">
+                </div>
+                
+                <div class="field-group">
+                    <label>当日在庫（自動計算）</label>
+                    <input type="number" value="6" class="readonly-field" readonly>
+                </div>
+                
+                <div class="field-group">
+                    <label>閉店時在庫</label>
+                    <input type="number" value="6">
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>在庫状況:</strong> ロス率5.7%で基準値を若干上回っています。
+                </div>
+            </div>
+            
+            <!-- 付帯情報カラム -->
+            <div class="column-section">
+                <h3>📊 付帯情報</h3>
+                
+                <div class="field-group">
+                    <label>特注</label>
+                    <input type="number" value="3">
+                </div>
+                
+                <div class="field-group">
+                    <label>客単価（円）</label>
+                    <input type="number" value="1205" class="readonly-field" readonly>
+                </div>
+                
+                <div class="field-group">
+                    <label>完売時間</label>
+                    <input type="time" value="18:30">
+                </div>
+                
+                <div class="field-group">
+                    <label>天気</label>
+                    <select>
+                        <option>晴れ</option>
+                        <option>曇り</option>
+                        <option>雨</option>
+                        <option>雪</option>
+                    </select>
+                </div>
+                
+                <div class="field-group">
+                    <label>気温（℃）</label>
+                    <input type="number" value="15">
+                </div>
+                
+                <div class="field-group">
+                    <label>メモ</label>
+                    <textarea placeholder="特記事項、気づき等を記録">午後からの雨で客足減少。予定より早い完売。</textarea>
+                </div>
+            </div>
+            
+            <!-- 時間帯別売上テーブル -->
+            <div class="column-section">
+                <h3>🕐 時間帯別売上</h3>
+                
+                <table class="hourly-table">
+                    <thead>
+                        <tr>
+                            <th>時間</th>
+                            <th>売上</th>
+                            <th>比率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09:00</td>
+                            <td><input type="number" value="320"></td>
+                            <td>2.4%</td>
+                        </tr>
+                        <tr>
+                            <td>10:00</td>
+                            <td><input type="number" value="760"></td>
+                            <td>5.7%</td>
+                        </tr>
+                        <tr>
+                            <td>11:00</td>
+                            <td><input type="number" value="1140"></td>
+                            <td>8.6%</td>
+                        </tr>
+                        <tr>
+                            <td>12:00</td>
+                            <td><input type="number" value="1520"></td>
+                            <td>11.4%</td>
+                        </tr>
+                        <tr>
+                            <td>13:00</td>
+                            <td><input type="number" value="1900"></td>
+                            <td>14.3%</td>
+                        </tr>
+                        <tr>
+                            <td>14:00</td>
+                            <td><input type="number" value="2280"></td>
+                            <td>17.1%</td>
+                        </tr>
+                        <tr>
+                            <td>15:00</td>
+                            <td><input type="number" value="1824"></td>
+                            <td>13.7%</td>
+                        </tr>
+                        <tr>
+                            <td>16:00</td>
+                            <td><input type="number" value="1368"></td>
+                            <td>10.3%</td>
+                        </tr>
+                        <tr>
+                            <td>17:00</td>
+                            <td><input type="number" value="1140"></td>
+                            <td>8.6%</td>
+                        </tr>
+                        <tr>
+                            <td>18:00</td>
+                            <td><input type="number" value="760"></td>
+                            <td>5.7%</td>
+                        </tr>
+                        <tr>
+                            <td>19:00</td>
+                            <td><input type="number" value="288"></td>
+                            <td>2.2%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 1rem; font-size: 0.8rem; text-align: center;">
+                    <strong>合計: ¥13,300</strong>
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.5rem; font-size: 0.8rem;">
+                    📊 グラフ表示
+                </button>
+            </div>
+        </div>
+        
+        <!-- サマリー情報 -->
+        <div class="summary-section">
+            <h2>📊 日次サマリー</h2>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h4>¥60,280</h4>
+                    <p>総売上額</p>
+                </div>
+                <div class="summary-card">
+                    <h4>134個</h4>
+                    <p>総販売数</p>
+                </div>
+                <div class="summary-card">
+                    <h4>8個</h4>
+                    <p>総ロス数</p>
+                </div>
+                <div class="summary-card">
+                    <h4>5.6%</h4>
+                    <p>ロス率</p>
+                </div>
+                <div class="summary-card">
+                    <h4>7件</h4>
+                    <p>特注件数</p>
+                </div>
+                <div class="summary-card">
+                    <h4>¥1,205</h4>
+                    <p>平均客単価</p>
+                </div>
+            </div>
+            
+            <div class="memo-section">
+                <h4>📝 本日の総括メモ</h4>
+                <textarea style="width: 100%; min-height: 100px;" placeholder="一日の総括、明日への申し送り事項等">
+雨天の影響で午後の売上が減少。ショートケーキは好調で早期完売。
+明日は天気予報で晴れのため、ショートケーキの仕込みを増量検討。
+フルーツタルトの動きが鈍いため、配置やPOPの見直しが必要。
+                </textarea>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <button class="btn btn-success">💾 データ保存</button>
+            <button class="btn btn-primary">📁 CSV出力</button>
+            <button class="btn btn-primary">🖨️ 印刷</button>
+            <button class="btn btn-primary">📧 レポート送信</button>
+        </div>
+    </div>
+</body>
+</html>

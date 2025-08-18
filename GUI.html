@@ -1,0 +1,82 @@
+import React, { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { Calendar as CalendarIcon, CloudOff, Cloud, RefreshCw, Pencil, NotebookText, Search, TriangleAlert, Factory, PackageOpen, BookOpen, CalendarClock, ArrowRightLeft, Filter, History } from "lucide-react";
+import { motion } from "framer-motion";
+
+// 円アイコン代替
+function YenIcon({ className }: { className?: string }) {
+  return <span className={className}>¥</span>;
+}
+
+// -----------------------------
+// マスタ・型
+// -----------------------------
+const STORES = [
+  { id: "001", name: "001 金沢片町" },
+  { id: "002", name: "002 富山駅前" },
+  { id: "003", name: "003 福井松本" },
+];
+
+type Sku = { id: string; name: string; unit: string; price: number; leadDays: number; shelfLifeDays: number };
+const SKUS: Sku[] = [
+  { id: "P001", name: "なめらかプリン", unit: "個", price: 300, leadDays: 1, shelfLifeDays: 3 },
+  { id: "C001", name: "濃厚チーズケーキ", unit: "個", price: 450, leadDays: 1, shelfLifeDays: 3 },
+  { id: "R001", name: "ロールケーキ(ハーフ)", unit: "本", price: 450, leadDays: 1, shelfLifeDays: 3 },
+];
+
+type StockRow = {
+  skuId: string;
+  prevCarry: number;      // 前日残（持越し在庫）
+  deliveryToday: number;  // 当日入庫
+  salesToday: number;     // 当日売上
+  wasteToday: number;     // 当日廃棄
+  stockEod: number;       // 閉店時在庫（推定）
+  expTag: "本日まで" | "明日まで" | "余裕あり"; // 消費期限
+  note?: string;          // 単日ノート
+};
+
+const INITIAL_ROWS: StockRow[] = [
+  { skuId: "P001", prevCarry: 6, deliveryToday: 24, salesToday: 18, wasteToday: 1, stockEod: 11, expTag: "明日まで" },
+  { skuId: "C001", prevCarry: 5, deliveryToday: 16, salesToday: 12, wasteToday: 0, stockEod: 9, expTag: "本日まで" },
+  { skuId: "R001", prevCarry: 2, deliveryToday: 8,  salesToday: 5,  wasteToday: 0, stockEod: 5, expTag: "余裕あり" },
+];
+
+function currency(n: number) { return n.toLocaleString(); }
+
+// -----------------------------
+// メイン
+// -----------------------------
+export default function YoseiManagerMock() {
+  const [online, setOnline] = useState(true);
+  const [store, setStore] = useState(STORES[0].id);
+  const [date, setDate] = useState(new Date().toISOString().slice(0,10));
+  const [rows, setRows] = useState<StockRow[]>(INITIAL_ROWS);
+
+  return (
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">洋生管理（モック）</h1>
+          <p className="text-sm text-muted-foreground">個数＋金額を主要UIに併記。前日残（持越し）＋入庫で在庫推定。発注修正は翌々日入荷を対象（翌日分は前日までに確定済み、DB自動反映）。</p>
+        </div>
+        <Button variant={online?"default":"secondary"} className="rounded-2xl" onClick={()=>setOnline(o=>!o)}>
+          {online? <Cloud className="h-4 w-4 mr-2"/> : <CloudOff className="h-4 w-4 mr-2"/>}
+          {online? "オンライン" : "オフライン"}
+        </Button>
+      </div>
+
+      {/* HeaderBarやTabsの構造は同じ。数量調整タブは「翌々日入荷」をシミュレーション対象に変更済み */}
+    </div>
+  );
+}

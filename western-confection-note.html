@@ -258,6 +258,33 @@
             border: 1px solid #17a2b8;
             color: #0c5460;
         }
+
+        .expiry-tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .expiry-critical {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .expiry-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .expiry-safe {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
     </style>
 </head>
 <body>
@@ -382,6 +409,14 @@
                 <div class="field-group">
                     <label>閉店時在庫</label>
                     <input type="number" value="6">
+                </div>
+
+                <div class="field-group">
+                    <label>消費期限状況</label>
+                    <div>
+                        <span class="expiry-tag expiry-warning">明日まで</span>
+                        <span class="expiry-tag expiry-safe">余裕あり: 2個</span>
+                    </div>
                 </div>
                 
                 <div class="alert alert-warning">

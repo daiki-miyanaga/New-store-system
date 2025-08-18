@@ -225,6 +225,30 @@
             border-radius: 4px;
             font-size: 0.8rem;
         }
+
+        .expiry-tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .expiry-critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .expiry-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .expiry-safe {
+            background: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
@@ -325,17 +349,18 @@
                             <th>商品名</th>
                             <th>単価</th>
                             <th>カテゴリ</th>
-                            <th>前日残</th>
-                            <th>製造数</th>
+                            <th>前日残<br><small>(持越し)</small></th>
+                            <th>当日入庫</th>
                             <th>移動</th>
                             <th>販売数</th>
                             <th>ロス数</th>
                             <th>当日在庫<br><small>(自動)</small></th>
-                            <th>閉店時在庫</th>
+                            <th>閉店時在庫<br><small>(EOD)</small></th>
                             <th>特注</th>
                             <th>完売時間</th>
                             <th>売上額</th>
                             <th>構成比</th>
+                            <th>消費期限</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -362,6 +387,7 @@
                             <td><input type="time" style="width: 80px;" value="18:30"></td>
                             <td style="background: #f0f0f0;">¥13,300</td>
                             <td style="background: #f0f0f0;">22.1%</td>
+                            <td><span class="expiry-tag expiry-warning">明日まで</span></td>
                             <td>
                                 <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">複製</button>
                                 <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button>
@@ -389,6 +415,7 @@
                             <td><input type="time" style="width: 80px;" value="19:15"></td>
                             <td style="background: #f0f0f0;">¥11,760</td>
                             <td style="background: #f0f0f0;">19.5%</td>
+                            <td><span class="expiry-tag expiry-safe">余裕あり</span></td>
                             <td>
                                 <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">複製</button>
                                 <button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button>
@@ -498,5 +525,56 @@
             <button class="btn btn-primary">📈 グラフ表示</button>
         </div>
     </div>
+    
+    <script>
+        // リアクティブ計算機能
+        function updateCalculations() {
+            const rows = document.querySelectorAll('.data-table tbody tr');
+            let totalSales = 0;
+            let totalItems = 0;
+            let totalWaste = 0;
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 10) {
+                    // 前日残 + 当日入庫 - 販売数 - ロス数 = 当日在庫の自動計算
+                    const prevStock = parseInt(cells[4].querySelector('input').value) || 0;
+                    const delivery = parseInt(cells[5].querySelector('input').value) || 0;
+                    const sales = parseInt(cells[7].querySelector('input').value) || 0;
+                    const waste = parseInt(cells[8].querySelector('input').value) || 0;
+                    const unitPrice = parseInt(cells[2].querySelector('input').value) || 0;
+                    
+                    // 当日在庫の自動更新
+                    const currentStock = prevStock + delivery - sales - waste;
+                    cells[9].textContent = currentStock;
+                    
+                    // 売上額の自動計算
+                    const salesAmount = sales * unitPrice;
+                    cells[12].textContent = '¥' + salesAmount.toLocaleString();
+                    
+                    totalSales += salesAmount;
+                    totalItems += sales;
+                    totalWaste += waste;
+                }
+            });
+            
+            // 合計情報の更新
+            const wasteRate = totalItems > 0 ? ((totalWaste / (totalItems + totalWaste)) * 100).toFixed(1) : 0;
+            const summaryElement = document.querySelector('.data-table + div');
+            if (summaryElement) {
+                summaryElement.innerHTML = `<strong>合計情報:</strong> 売上額: ¥${totalSales.toLocaleString()} | 総販売数: ${totalItems}個 | 総ロス数: ${totalWaste}個 | ロス率: ${wasteRate}%`;
+            }
+        }
+        
+        // 入力フィールドの変更を監視
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
+                updateCalculations();
+            }
+        });
+        
+        // 初期計算実行
+        document.addEventListener('DOMContentLoaded', updateCalculations);
+    </script>
 </body>
 </html>

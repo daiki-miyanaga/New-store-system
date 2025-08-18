@@ -32,6 +32,37 @@
         
         .user-info {
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-online {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status-offline {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .status-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: currentColor;
         }
         
         .container {
@@ -125,6 +156,10 @@
         <h1>🏪 在庫管理システム</h1>
         <div class="user-info">
             <span>ユーザー: 管理者 | 最終ログイン: 2024-01-15 14:30</span>
+            <div class="connection-status status-online" onclick="toggleConnection()">
+                <div class="status-icon"></div>
+                <span id="connection-text">オンライン</span>
+            </div>
         </div>
     </div>
     
@@ -177,5 +212,23 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        let isOnline = true;
+        
+        function toggleConnection() {
+            isOnline = !isOnline;
+            const statusElement = document.querySelector('.connection-status');
+            const textElement = document.getElementById('connection-text');
+            
+            if (isOnline) {
+                statusElement.className = 'connection-status status-online';
+                textElement.textContent = 'オンライン';
+            } else {
+                statusElement.className = 'connection-status status-offline';
+                textElement.textContent = 'オフライン';
+            }
+        }
+    </script>
 </body>
 </html>

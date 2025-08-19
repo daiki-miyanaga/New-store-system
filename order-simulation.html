@@ -409,6 +409,121 @@
             color: #2c3e50;
         }
         
+        /* 個別商品調整パネル */
+        .product-adjustment-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .sync-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .sync-status {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+        
+        .individual-products {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .product-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 200px 120px 1fr 120px;
+            gap: 1rem;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .product-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .product-price {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .product-stock {
+            text-align: center;
+        }
+        
+        .stock-value {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.1rem;
+        }
+        
+        .product-slider {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .product-slider label {
+            min-width: 60px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .product-slider input[type="range"] {
+            flex: 1;
+        }
+        
+        .order-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .product-amount {
+            text-align: center;
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 1.1rem;
+        }
+        
+        .adjustment-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .summary-item {
+            padding: 0.5rem;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        
         /* チャートコンテナ */
         .charts-container {
             display: grid;
@@ -509,6 +624,17 @@
             .inventory-forecast {
                 grid-template-columns: 1fr;
                 gap: 1rem;
+            }
+            
+            .product-item {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                text-align: center;
+            }
+            
+            .sync-controls {
+                flex-direction: column;
+                gap: 0.75rem;
             }
             
             .slider-item {
@@ -762,33 +888,124 @@
             </div>
         </div>
 
-        <!-- スライダー調整パネル（仕様書SIM-001準拠） -->
+        <!-- 実績入力連動・個別商品調整パネル -->
         <div class="form-section">
-            <h2>🎛️ 構成比・数量スライダー調整</h2>
-            <div class="slider-panel">
-                <div class="slider-item">
-                    <label>ケーキ類:</label>
-                    <input type="range" id="cakeSlider" min="30" max="50" value="40" step="1">
-                    <div class="slider-value"><span id="cakeValue">40</span>%</div>
+            <h2>🎛️ 個別商品発注数調整（実績入力連動）</h2>
+            <div class="product-adjustment-panel">
+                <div class="sync-controls">
+                    <button id="syncFromPerformance" class="btn btn-success">📊 実績入力から在庫同期</button>
+                    <div class="sync-status" id="syncStatus">
+                        <span style="color: #6c757d;">実績入力ページのデータと同期してください</span>
+                    </div>
                 </div>
-                <div class="slider-item">
-                    <label>プリン類:</label>
-                    <input type="range" id="puddingSlider" min="15" max="35" value="25" step="1">
-                    <div class="slider-value"><span id="puddingValue">25</span>%</div>
+                
+                <div class="individual-products">
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-name">ショートケーキ</span>
+                            <span class="product-price">¥380</span>
+                        </div>
+                        <div class="product-stock">
+                            <label>在庫:</label>
+                            <span id="stock-YS001" class="stock-value">6</span>個
+                        </div>
+                        <div class="product-slider">
+                            <label>発注数:</label>
+                            <input type="range" id="orderSlider-YS001" min="0" max="50" value="35" step="1">
+                            <span id="orderValue-YS001" class="order-value">35</span>個
+                        </div>
+                        <div class="product-amount">
+                            ¥<span id="amount-YS001">13,300</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-name">チーズケーキ</span>
+                            <span class="product-price">¥420</span>
+                        </div>
+                        <div class="product-stock">
+                            <label>在庫:</label>
+                            <span id="stock-YS002" class="stock-value">3</span>個
+                        </div>
+                        <div class="product-slider">
+                            <label>発注数:</label>
+                            <input type="range" id="orderSlider-YS002" min="0" max="50" value="18" step="1">
+                            <span id="orderValue-YS002" class="order-value">18</span>個
+                        </div>
+                        <div class="product-amount">
+                            ¥<span id="amount-YS002">7,560</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-name">フルーツタルト</span>
+                            <span class="product-price">¥350</span>
+                        </div>
+                        <div class="product-stock">
+                            <label>在庫:</label>
+                            <span id="stock-YS003" class="stock-value">0</span>個
+                        </div>
+                        <div class="product-slider">
+                            <label>発注数:</label>
+                            <input type="range" id="orderSlider-YS003" min="0" max="50" value="20" step="1">
+                            <span id="orderValue-YS003" class="order-value">20</span>個
+                        </div>
+                        <div class="product-amount">
+                            ¥<span id="amount-YS003">7,000</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-name">チョコレートケーキ</span>
+                            <span class="product-price">¥400</span>
+                        </div>
+                        <div class="product-stock">
+                            <label>在庫:</label>
+                            <span id="stock-YS004" class="stock-value">8</span>個
+                        </div>
+                        <div class="product-slider">
+                            <label>発注数:</label>
+                            <input type="range" id="orderSlider-YS004" min="0" max="50" value="22" step="1">
+                            <span id="orderValue-YS004" class="order-value">22</span>個
+                        </div>
+                        <div class="product-amount">
+                            ¥<span id="amount-YS004">8,800</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-name">モンブラン</span>
+                            <span class="product-price">¥450</span>
+                        </div>
+                        <div class="product-stock">
+                            <label>在庫:</label>
+                            <span id="stock-YS005" class="stock-value">12</span>個
+                        </div>
+                        <div class="product-slider">
+                            <label>発注数:</label>
+                            <input type="range" id="orderSlider-YS005" min="0" max="50" value="15" step="1">
+                            <span id="orderValue-YS005" class="order-value">15</span>個
+                        </div>
+                        <div class="product-amount">
+                            ¥<span id="amount-YS005">6,750</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="slider-item">
-                    <label>ゼリー類:</label>
-                    <input type="range" id="jellySlider" min="10" max="25" value="15" step="1">
-                    <div class="slider-value"><span id="jellyValue">15</span>%</div>
-                </div>
-                <div class="slider-item">
-                    <label>その他:</label>
-                    <input type="range" id="otherSlider" min="10" max="30" value="20" step="1">
-                    <div class="slider-value"><span id="otherValue">20</span>%</div>
-                </div>
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-                    <strong>合計構成比: <span id="totalComposition">100</span>%</strong>
-                    <span id="compositionAlert" style="color: #e74c3c; margin-left: 1rem; display: none;">⚠️ 合計が100%ではありません</span>
+                
+                <div class="adjustment-summary">
+                    <div class="summary-item">
+                        <strong>合計発注数: <span id="totalOrderQuantity">110</span>個</strong>
+                    </div>
+                    <div class="summary-item">
+                        <strong>合計金額: ¥<span id="totalOrderAmount">43,410</span></strong>
+                    </div>
+                    <div class="summary-item">
+                        <strong>平均在庫充足率: <span id="averageStockRate">72%</span></strong>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1078,16 +1295,21 @@
         
         // イベントリスナー設定
         function setupEventListeners() {
-            // スライダーイベント
-            ['cake', 'pudding', 'jelly', 'other'].forEach(category => {
-                const slider = document.getElementById(category + 'Slider');
+            // 個別商品スライダーのイベント
+            ['YS001', 'YS002', 'YS003', 'YS004', 'YS005'].forEach(productCode => {
+                const slider = document.getElementById('orderSlider-' + productCode);
                 if (slider) {
                     slider.addEventListener('input', function() {
-                        updateSliderValue(category, this.value);
-                        updateCompositionChart();
+                        updateProductOrder(productCode, this.value);
                     });
                 }
             });
+            
+            // 実績入力からの同期ボタン
+            const syncButton = document.getElementById('syncFromPerformance');
+            if (syncButton) {
+                syncButton.addEventListener('click', syncFromPerformanceData);
+            }
             
             // 発注数量入力フィールドのイベント
             document.querySelectorAll('.order-input').forEach(input => {
@@ -1321,6 +1543,97 @@
                     }
                 </div>
             `;
+        }
+        
+        // 個別商品発注数更新
+        function updateProductOrder(productCode, quantity) {
+            const orderValue = parseInt(quantity);
+            const price = productData[productCode].price;
+            const amount = orderValue * price;
+            
+            // 表示更新
+            document.getElementById('orderValue-' + productCode).textContent = orderValue;
+            document.getElementById('amount-' + productCode).textContent = amount.toLocaleString();
+            
+            // 合計計算の更新
+            updateOrderSummary();
+            updateAllCalculations();
+        }
+        
+        // 発注サマリーの更新
+        function updateOrderSummary() {
+            let totalQuantity = 0;
+            let totalAmount = 0;
+            let totalStock = 0;
+            let stockedProducts = 0;
+            
+            ['YS001', 'YS002', 'YS003', 'YS004', 'YS005'].forEach(productCode => {
+                const orderQuantity = parseInt(document.getElementById('orderValue-' + productCode).textContent);
+                const stock = parseInt(document.getElementById('stock-' + productCode).textContent);
+                const price = productData[productCode].price;
+                
+                totalQuantity += orderQuantity;
+                totalAmount += orderQuantity * price;
+                totalStock += stock;
+                if (stock > 0) stockedProducts++;
+            });
+            
+            const averageStockRate = stockedProducts > 0 ? Math.round((stockedProducts / 5) * 100) : 0;
+            
+            document.getElementById('totalOrderQuantity').textContent = totalQuantity;
+            document.getElementById('totalOrderAmount').textContent = totalAmount.toLocaleString();
+            document.getElementById('averageStockRate').textContent = averageStockRate + '%';
+        }
+        
+        // 実績入力データからの同期機能
+        function syncFromPerformanceData() {
+            // LocalStorageから実績入力データを取得（実際の実装では実績入力ページから取得）
+            const performanceData = getPerformanceData();
+            
+            if (performanceData && performanceData.length > 0) {
+                // 在庫データを同期
+                performanceData.forEach(item => {
+                    const stockElement = document.getElementById('stock-' + item.productCode);
+                    if (stockElement) {
+                        stockElement.textContent = item.currentStock || 0;
+                        // 在庫に応じた発注数の自動調整
+                        adjustOrderBasedOnStock(item.productCode, item.currentStock || 0);
+                    }
+                });
+                
+                // 同期状態の更新
+                document.getElementById('syncStatus').innerHTML = 
+                    `<span style="color: #27ae60;">✅ ${new Date().toLocaleTimeString()} に実績入力データと同期完了</span>`;
+                
+                updateOrderSummary();
+            } else {
+                document.getElementById('syncStatus').innerHTML = 
+                    `<span style="color: #e74c3c;">❌ 実績入力データが見つかりません</span>`;
+            }
+        }
+        
+        // 在庫に応じた発注数の自動調整
+        function adjustOrderBasedOnStock(productCode, currentStock) {
+            const avgSales = inventoryData[productCode].avgDailySales;
+            const recommendedOrder = Math.max(0, Math.round(avgSales * 1.2 - currentStock)); // 20%マージン
+            
+            const slider = document.getElementById('orderSlider-' + productCode);
+            if (slider) {
+                slider.value = Math.min(recommendedOrder, 50); // 最大50個
+                updateProductOrder(productCode, slider.value);
+            }
+        }
+        
+        // 実績入力データの取得（シミュレーション用のサンプルデータ）
+        function getPerformanceData() {
+            // 実際の実装では実績入力ページのデータまたはAPIから取得
+            return [
+                { productCode: 'YS001', productName: 'ショートケーキ', currentStock: 6 },
+                { productCode: 'YS002', productName: 'チーズケーキ', currentStock: 3 },
+                { productCode: 'YS003', productName: 'フルーツタルト', currentStock: 0 },
+                { productCode: 'YS004', productName: 'チョコレートケーキ', currentStock: 8 },
+                { productCode: 'YS005', productName: 'モンブラン', currentStock: 12 }
+            ];
         }
     </script>
 </body>

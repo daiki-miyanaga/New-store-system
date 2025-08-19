@@ -524,6 +524,154 @@
             background: #f8f9fa;
         }
         
+        /* 構成比調整パネル */
+        .composition-adjustment-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .budget-input-section {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .budget-input-section .form-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0;
+        }
+        
+        .budget-input-section input {
+            width: 120px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .composition-products {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .product-composition-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 250px 1fr 180px;
+            gap: 1rem;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .product-composition-item .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .product-composition-item .product-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+        
+        .product-composition-item .product-price {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .product-composition-item .product-stock {
+            font-size: 0.8rem;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .composition-slider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .composition-slider label {
+            min-width: 70px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .composition-slider input[type="range"] {
+            flex: 1;
+        }
+        
+        .composition-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #3498db;
+            font-size: 1.1rem;
+        }
+        
+        .calculated-results {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            text-align: center;
+        }
+        
+        .calc-quantity {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .calc-amount {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 1rem;
+        }
+        
+        .composition-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .summary-label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .summary-value {
+            font-weight: bold;
+            color: #3498db;
+            font-size: 1.1rem;
+        }
+        
         /* チャートコンテナ */
         .charts-container {
             display: grid;
@@ -888,123 +1036,152 @@
             </div>
         </div>
 
-        <!-- 実績入力連動・個別商品調整パネル -->
+        <!-- 構成比ベース発注調整パネル -->
         <div class="form-section">
-            <h2>🎛️ 個別商品発注数調整（実績入力連動）</h2>
-            <div class="product-adjustment-panel">
-                <div class="sync-controls">
-                    <button id="syncFromPerformance" class="btn btn-success">📊 実績入力から在庫同期</button>
-                    <div class="sync-status" id="syncStatus">
-                        <span style="color: #6c757d;">実績入力ページのデータと同期してください</span>
+            <h2>📊 構成比ベース発注調整（実績入力連動）</h2>
+            <div class="composition-adjustment-panel">
+                <div class="budget-input-section">
+                    <div class="form-group">
+                        <label>合計発注予算:</label>
+                        <input type="number" id="totalBudgetInput" value="60000" min="1000" step="1000" placeholder="60000">
+                        <span>円</span>
+                    </div>
+                    <div class="sync-controls">
+                        <button id="syncFromPerformance" class="btn btn-success">📊 実績入力から在庫同期</button>
+                        <div class="sync-status" id="syncStatus">
+                            <span style="color: #6c757d;">実績入力ページのデータと同期してください</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="individual-products">
-                    <div class="product-item">
+                <div class="composition-products">
+                    <div class="product-composition-item">
                         <div class="product-info">
                             <span class="product-name">ショートケーキ</span>
                             <span class="product-price">¥380</span>
+                            <span class="product-stock">在庫: <span id="stock-YS001">6</span>個</span>
                         </div>
-                        <div class="product-stock">
-                            <label>在庫:</label>
-                            <span id="stock-YS001" class="stock-value">6</span>個
+                        <div class="composition-slider">
+                            <label>構成比:</label>
+                            <input type="range" id="compositionSlider-YS001" min="0" max="50" value="25" step="0.5">
+                            <span id="compositionValue-YS001" class="composition-value">25.0</span>%
                         </div>
-                        <div class="product-slider">
-                            <label>発注数:</label>
-                            <input type="range" id="orderSlider-YS001" min="0" max="50" value="35" step="1">
-                            <span id="orderValue-YS001" class="order-value">35</span>個
-                        </div>
-                        <div class="product-amount">
-                            ¥<span id="amount-YS001">13,300</span>
+                        <div class="calculated-results">
+                            <div class="calc-quantity">
+                                <span id="calcQuantity-YS001">39</span>個
+                            </div>
+                            <div class="calc-amount">
+                                ¥<span id="calcAmount-YS001">14,820</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="product-item">
+                    <div class="product-composition-item">
                         <div class="product-info">
                             <span class="product-name">チーズケーキ</span>
                             <span class="product-price">¥420</span>
+                            <span class="product-stock">在庫: <span id="stock-YS002">3</span>個</span>
                         </div>
-                        <div class="product-stock">
-                            <label>在庫:</label>
-                            <span id="stock-YS002" class="stock-value">3</span>個
+                        <div class="composition-slider">
+                            <label>構成比:</label>
+                            <input type="range" id="compositionSlider-YS002" min="0" max="50" value="20" step="0.5">
+                            <span id="compositionValue-YS002" class="composition-value">20.0</span>%
                         </div>
-                        <div class="product-slider">
-                            <label>発注数:</label>
-                            <input type="range" id="orderSlider-YS002" min="0" max="50" value="18" step="1">
-                            <span id="orderValue-YS002" class="order-value">18</span>個
-                        </div>
-                        <div class="product-amount">
-                            ¥<span id="amount-YS002">7,560</span>
+                        <div class="calculated-results">
+                            <div class="calc-quantity">
+                                <span id="calcQuantity-YS002">29</span>個
+                            </div>
+                            <div class="calc-amount">
+                                ¥<span id="calcAmount-YS002">12,180</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="product-item">
+                    <div class="product-composition-item">
                         <div class="product-info">
                             <span class="product-name">フルーツタルト</span>
                             <span class="product-price">¥350</span>
+                            <span class="product-stock">在庫: <span id="stock-YS003">0</span>個</span>
                         </div>
-                        <div class="product-stock">
-                            <label>在庫:</label>
-                            <span id="stock-YS003" class="stock-value">0</span>個
+                        <div class="composition-slider">
+                            <label>構成比:</label>
+                            <input type="range" id="compositionSlider-YS003" min="0" max="50" value="15" step="0.5">
+                            <span id="compositionValue-YS003" class="composition-value">15.0</span>%
                         </div>
-                        <div class="product-slider">
-                            <label>発注数:</label>
-                            <input type="range" id="orderSlider-YS003" min="0" max="50" value="20" step="1">
-                            <span id="orderValue-YS003" class="order-value">20</span>個
-                        </div>
-                        <div class="product-amount">
-                            ¥<span id="amount-YS003">7,000</span>
+                        <div class="calculated-results">
+                            <div class="calc-quantity">
+                                <span id="calcQuantity-YS003">26</span>個
+                            </div>
+                            <div class="calc-amount">
+                                ¥<span id="calcAmount-YS003">9,100</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="product-item">
+                    <div class="product-composition-item">
                         <div class="product-info">
                             <span class="product-name">チョコレートケーキ</span>
                             <span class="product-price">¥400</span>
+                            <span class="product-stock">在庫: <span id="stock-YS004">8</span>個</span>
                         </div>
-                        <div class="product-stock">
-                            <label>在庫:</label>
-                            <span id="stock-YS004" class="stock-value">8</span>個
+                        <div class="composition-slider">
+                            <label>構成比:</label>
+                            <input type="range" id="compositionSlider-YS004" min="0" max="50" value="22" step="0.5">
+                            <span id="compositionValue-YS004" class="composition-value">22.0</span>%
                         </div>
-                        <div class="product-slider">
-                            <label>発注数:</label>
-                            <input type="range" id="orderSlider-YS004" min="0" max="50" value="22" step="1">
-                            <span id="orderValue-YS004" class="order-value">22</span>個
-                        </div>
-                        <div class="product-amount">
-                            ¥<span id="amount-YS004">8,800</span>
+                        <div class="calculated-results">
+                            <div class="calc-quantity">
+                                <span id="calcQuantity-YS004">33</span>個
+                            </div>
+                            <div class="calc-amount">
+                                ¥<span id="calcAmount-YS004">13,200</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="product-item">
+                    <div class="product-composition-item">
                         <div class="product-info">
                             <span class="product-name">モンブラン</span>
                             <span class="product-price">¥450</span>
+                            <span class="product-stock">在庫: <span id="stock-YS005">12</span>個</span>
                         </div>
-                        <div class="product-stock">
-                            <label>在庫:</label>
-                            <span id="stock-YS005" class="stock-value">12</span>個
+                        <div class="composition-slider">
+                            <label>構成比:</label>
+                            <input type="range" id="compositionSlider-YS005" min="0" max="50" value="18" step="0.5">
+                            <span id="compositionValue-YS005" class="composition-value">18.0</span>%
                         </div>
-                        <div class="product-slider">
-                            <label>発注数:</label>
-                            <input type="range" id="orderSlider-YS005" min="0" max="50" value="15" step="1">
-                            <span id="orderValue-YS005" class="order-value">15</span>個
-                        </div>
-                        <div class="product-amount">
-                            ¥<span id="amount-YS005">6,750</span>
+                        <div class="calculated-results">
+                            <div class="calc-quantity">
+                                <span id="calcQuantity-YS005">24</span>個
+                            </div>
+                            <div class="calc-amount">
+                                ¥<span id="calcAmount-YS005">10,800</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="adjustment-summary">
-                    <div class="summary-item">
-                        <strong>合計発注数: <span id="totalOrderQuantity">110</span>個</strong>
+                <div class="composition-summary">
+                    <div class="summary-row">
+                        <div class="summary-label">構成比合計:</div>
+                        <div class="summary-value">
+                            <span id="totalComposition">100.0</span>%
+                            <span id="compositionWarning" style="color: #e74c3c; margin-left: 0.5rem; display: none;">
+                                ⚠️ 100%ではありません
+                            </span>
+                        </div>
                     </div>
-                    <div class="summary-item">
-                        <strong>合計金額: ¥<span id="totalOrderAmount">43,410</span></strong>
+                    <div class="summary-row">
+                        <div class="summary-label">合計発注数:</div>
+                        <div class="summary-value"><span id="totalCalcQuantity">151</span>個</div>
                     </div>
-                    <div class="summary-item">
-                        <strong>平均在庫充足率: <span id="averageStockRate">72%</span></strong>
+                    <div class="summary-row">
+                        <div class="summary-label">合計金額:</div>
+                        <div class="summary-value">¥<span id="totalCalcAmount">60,100</span></div>
+                    </div>
+                    <div class="summary-row">
+                        <div class="summary-label">予算使用率:</div>
+                        <div class="summary-value"><span id="budgetUsageRate">100.2</span>%</div>
                     </div>
                 </div>
             </div>
@@ -1266,6 +1443,7 @@
             setupEventListeners();
             setupMultiDayBudget();
             setupInventoryForecast();
+            calculateQuantitiesFromComposition(); // 構成比ベースの初期計算
         });
         
         // チャート初期化
@@ -1295,15 +1473,24 @@
         
         // イベントリスナー設定
         function setupEventListeners() {
-            // 個別商品スライダーのイベント
+            // 構成比スライダーのイベント
             ['YS001', 'YS002', 'YS003', 'YS004', 'YS005'].forEach(productCode => {
-                const slider = document.getElementById('orderSlider-' + productCode);
+                const slider = document.getElementById('compositionSlider-' + productCode);
                 if (slider) {
                     slider.addEventListener('input', function() {
-                        updateProductOrder(productCode, this.value);
+                        updateCompositionValue(productCode, this.value);
+                        calculateQuantitiesFromComposition();
                     });
                 }
             });
+            
+            // 予算入力フィールドのイベント
+            const budgetInput = document.getElementById('totalBudgetInput');
+            if (budgetInput) {
+                budgetInput.addEventListener('input', function() {
+                    calculateQuantitiesFromComposition();
+                });
+            }
             
             // 実績入力からの同期ボタン
             const syncButton = document.getElementById('syncFromPerformance');
@@ -1543,6 +1730,80 @@
                     }
                 </div>
             `;
+        }
+        
+        // 構成比スライダー値の更新
+        function updateCompositionValue(productCode, value) {
+            document.getElementById('compositionValue-' + productCode).textContent = parseFloat(value).toFixed(1);
+        }
+        
+        // 構成比から個数・金額の自動計算
+        function calculateQuantitiesFromComposition() {
+            const totalBudget = parseInt(document.getElementById('totalBudgetInput').value) || 60000;
+            let totalComposition = 0;
+            let totalCalculatedAmount = 0;
+            let totalCalculatedQuantity = 0;
+            
+            // 各商品の構成比を取得し、個数と金額を計算
+            ['YS001', 'YS002', 'YS003', 'YS004', 'YS005'].forEach(productCode => {
+                const compositionSlider = document.getElementById('compositionSlider-' + productCode);
+                const compositionValue = parseFloat(compositionSlider.value);
+                const price = productData[productCode].price;
+                
+                // 構成比から金額を計算
+                const allocatedAmount = (totalBudget * compositionValue) / 100;
+                
+                // 金額から個数を計算（整数に丸める）
+                const quantity = Math.floor(allocatedAmount / price);
+                const actualAmount = quantity * price;
+                
+                // 表示を更新
+                document.getElementById('calcQuantity-' + productCode).textContent = quantity;
+                document.getElementById('calcAmount-' + productCode).textContent = actualAmount.toLocaleString();
+                
+                totalComposition += compositionValue;
+                totalCalculatedAmount += actualAmount;
+                totalCalculatedQuantity += quantity;
+            });
+            
+            // 合計情報の更新
+            updateCompositionSummary(totalComposition, totalCalculatedQuantity, totalCalculatedAmount, totalBudget);
+        }
+        
+        // 構成比サマリーの更新
+        function updateCompositionSummary(totalComposition, totalQuantity, totalAmount, totalBudget) {
+            // 構成比合計の表示
+            document.getElementById('totalComposition').textContent = totalComposition.toFixed(1);
+            
+            // 合計発注数の表示
+            document.getElementById('totalCalcQuantity').textContent = totalQuantity;
+            
+            // 合計金額の表示
+            document.getElementById('totalCalcAmount').textContent = totalAmount.toLocaleString();
+            
+            // 予算使用率の計算と表示
+            const budgetUsageRate = totalBudget > 0 ? ((totalAmount / totalBudget) * 100) : 0;
+            document.getElementById('budgetUsageRate').textContent = budgetUsageRate.toFixed(1);
+            
+            // 構成比が100%でない場合の警告表示
+            const compositionWarning = document.getElementById('compositionWarning');
+            if (Math.abs(totalComposition - 100) > 0.1) {
+                compositionWarning.style.display = 'inline';
+                compositionWarning.textContent = totalComposition > 100 ? 
+                    '⚠️ 100%を超えています' : '⚠️ 100%未満です';
+            } else {
+                compositionWarning.style.display = 'none';
+            }
+            
+            // 予算使用率に応じた色分け
+            const budgetRateElement = document.getElementById('budgetUsageRate');
+            if (budgetUsageRate > 105) {
+                budgetRateElement.style.color = '#e74c3c'; // 赤
+            } else if (budgetUsageRate > 95) {
+                budgetRateElement.style.color = '#f39c12'; // オレンジ
+            } else {
+                budgetRateElement.style.color = '#27ae60'; // 緑
+            }
         }
         
         // 個別商品発注数更新

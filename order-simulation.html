@@ -304,6 +304,24 @@
             gap: 1.5rem;
         }
         
+        .total-budget-card {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+            border: 2px solid #3498db;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .budget-previous-year {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .budget-previous-year small {
+            color: #f8f9fa;
+        }
+        
         .budget-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -769,6 +787,10 @@
                 gap: 1rem;
             }
             
+            .total-budget-card {
+                order: -1; /* モバイルでは上部に表示 */
+            }
+            
             .inventory-forecast {
                 grid-template-columns: 1fr;
                 gap: 1rem;
@@ -814,6 +836,12 @@
                 gap: 1rem;
             }
             
+            .budget-previous-year {
+                flex-direction: column;
+                gap: 0.25rem;
+                text-align: center;
+            }
+            
             .result-card {
                 padding: 1rem;
             }
@@ -842,6 +870,14 @@
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
+            }
+            
+            .total-budget-card .budget-date {
+                font-size: 1rem;
+            }
+            
+            .total-budget-card .budget-limit {
+                font-size: 1.5rem;
             }
         }
         
@@ -965,6 +1001,10 @@
                 <div class="budget-card">
                     <div class="budget-date">本日 (8/19)</div>
                     <div class="budget-limit">¥60,000</div>
+                    <div class="budget-previous-year">
+                        <small>前年同日: ¥52,100</small>
+                        <small class="change-positive">+15.2%</small>
+                    </div>
                     <div class="budget-progress">
                         <div class="budget-progress-bar" id="todayBudgetBar" style="width: 73%"></div>
                     </div>
@@ -978,6 +1018,10 @@
                     <div class="budget-input-group">
                         <label>予算設定:</label>
                         <input type="number" id="tomorrowBudgetInput" value="65000" placeholder="65000" min="0" step="1000">
+                    </div>
+                    <div class="budget-previous-year">
+                        <small>前年同日: ¥58,300</small>
+                        <small class="change-positive">+11.5%</small>
                     </div>
                     <div class="budget-progress">
                         <div class="budget-progress-bar" id="tomorrowBudgetBar" style="width: 0%"></div>
@@ -993,11 +1037,31 @@
                         <label>予算設定:</label>
                         <input type="number" id="dayAfterBudgetInput" value="58000" placeholder="58000" min="0" step="1000">
                     </div>
+                    <div class="budget-previous-year">
+                        <small>前年同日: ¥49,800</small>
+                        <small class="change-positive">+16.5%</small>
+                    </div>
                     <div class="budget-progress">
                         <div class="budget-progress-bar" id="dayAfterBudgetBar" style="width: 0%"></div>
                     </div>
                     <div class="budget-current">
                         自動修正: <span id="dayAfterBudget">¥0</span> (<span id="dayAfterPercentage">0</span>%)
+                    </div>
+                </div>
+                
+                <!-- 三日間合計トータル -->
+                <div class="budget-card total-budget-card">
+                    <div class="budget-date">📊 3日間合計</div>
+                    <div class="budget-limit" id="totalBudgetLimit">¥183,000</div>
+                    <div class="budget-previous-year">
+                        <small>前年3日間: ¥160,200</small>
+                        <small class="change-positive" id="totalPreviousYearChange">+14.2%</small>
+                    </div>
+                    <div class="budget-progress">
+                        <div class="budget-progress-bar" id="totalBudgetBar" style="width: 23.9%"></div>
+                    </div>
+                    <div class="budget-current">
+                        現在: <span id="totalBudget">¥43,800</span> (<span id="totalBudgetPercentage">23.9</span>%)
                     </div>
                 </div>
             </div>
@@ -1199,6 +1263,7 @@
                         <th>現在発注数</th>
                         <th>参考日実績</th>
                         <th>前年実績</th>
+                        <th>前年比</th>
                         <th>修正発注数</th>
                         <th>構成比</th>
                         <th>差分</th>
@@ -1216,6 +1281,7 @@
                         <td class="current-order">30</td>
                         <td>33</td>
                         <td>28</td>
+                        <td class="change-positive">+7.1%</td>
                         <td><input type="number" class="order-input" value="35" data-min="12" data-step="6"></td>
                         <td class="composition-cell">18.2%</td>
                         <td class="change-positive">+5</td>
@@ -1231,6 +1297,7 @@
                         <td class="current-order">20</td>
                         <td>22</td>
                         <td>18</td>
+                        <td class="change-positive">+11.1%</td>
                         <td><input type="number" class="order-input" value="18" data-min="6" data-step="3"></td>
                         <td class="composition-cell">9.4%</td>
                         <td class="change-negative">-2</td>
@@ -1246,6 +1313,7 @@
                         <td class="current-order">15</td>
                         <td>18</td>
                         <td>12</td>
+                        <td class="change-positive">+25.0%</td>
                         <td><input type="number" class="order-input" value="20" data-min="8" data-step="4"></td>
                         <td class="composition-cell">10.4%</td>
                         <td class="change-positive">+5</td>
@@ -1261,6 +1329,7 @@
                         <td class="current-order">25</td>
                         <td>27</td>
                         <td>23</td>
+                        <td class="change-positive">+8.7%</td>
                         <td><input type="number" class="order-input" value="22" data-min="10" data-step="2"></td>
                         <td class="composition-cell">11.5%</td>
                         <td class="change-negative">-3</td>
@@ -1276,6 +1345,7 @@
                         <td class="current-order">12</td>
                         <td>14</td>
                         <td>10</td>
+                        <td class="change-positive">+20.0%</td>
                         <td><input type="number" class="order-input" value="15" data-min="5" data-step="1"></td>
                         <td class="composition-cell">7.8%</td>
                         <td class="change-positive">+3</td>
@@ -1422,9 +1492,18 @@
         
         // 複数日予算管理データ
         const budgetData = {
-            today: { budget: 60000, current: 0 },
-            tomorrow: { budget: 65000, current: 0 },
-            dayAfter: { budget: 58000, current: 0 }
+            today: { budget: 60000, current: 0, previousYear: 52100 },
+            tomorrow: { budget: 65000, current: 0, previousYear: 58300 },
+            dayAfter: { budget: 58000, current: 0, previousYear: 49800 }
+        };
+        
+        // 前年実績データ
+        const previousYearData = {
+            'YS001': 28,
+            'YS002': 18,
+            'YS003': 12,
+            'YS004': 23,
+            'YS005': 10
         };
         
         // 商品別在庫データ（自動修正用）
@@ -1444,6 +1523,7 @@
             setupMultiDayBudget();
             setupInventoryForecast();
             calculateQuantitiesFromComposition(); // 構成比ベースの初期計算
+            updateTotalBudgetDisplay(); // 3日間合計の初期表示
         });
         
         // チャート初期化
@@ -1628,6 +1708,7 @@
             // 本日予算の更新
             budgetData.today.current = totalAmount;
             updateBudgetDisplay('today', totalAmount);
+            updateTotalBudgetDisplay(); // 3日間合計の更新
         }
         
         // 複数日予算管理の設定
@@ -1637,12 +1718,14 @@
                 budgetData.tomorrow.budget = parseInt(this.value) || 0;
                 updateBudgetDisplay('tomorrow', budgetData.tomorrow.current);
                 calculateInventoryForecast();
+                updateTotalBudgetDisplay();
             });
             
             document.getElementById('dayAfterBudgetInput').addEventListener('input', function() {
                 budgetData.dayAfter.budget = parseInt(this.value) || 0;
                 updateBudgetDisplay('dayAfter', budgetData.dayAfter.current);
                 calculateInventoryForecast();
+                updateTotalBudgetDisplay();
             });
         }
         
@@ -1650,6 +1733,9 @@
         function updateBudgetDisplay(day, currentAmount) {
             const budget = budgetData[day].budget;
             const percentage = budget > 0 ? Math.min((currentAmount / budget) * 100, 100) : 0;
+            
+            // 予算データの更新
+            budgetData[day].current = currentAmount;
             
             let budgetSpanId, barId, percentageSpanId;
             
@@ -1674,6 +1760,43 @@
             
             if (percentageSpanId) {
                 document.getElementById(percentageSpanId).textContent = percentage.toFixed(1);
+            }
+        }
+        
+        // 3日間合計予算表示の更新
+        function updateTotalBudgetDisplay() {
+            // 3日間の予算合計
+            const totalBudgetLimit = budgetData.today.budget + budgetData.tomorrow.budget + budgetData.dayAfter.budget;
+            
+            // 3日間の現在金額合計
+            const totalCurrentAmount = budgetData.today.current + budgetData.tomorrow.current + budgetData.dayAfter.current;
+            
+            // 3日間の前年実績合計
+            const totalPreviousYear = budgetData.today.previousYear + budgetData.tomorrow.previousYear + budgetData.dayAfter.previousYear;
+            
+            // 前年比の計算
+            const previousYearChange = totalPreviousYear > 0 ? 
+                ((totalBudgetLimit - totalPreviousYear) / totalPreviousYear * 100) : 0;
+            
+            // 使用率の計算
+            const totalUsagePercentage = totalBudgetLimit > 0 ? 
+                (totalCurrentAmount / totalBudgetLimit * 100) : 0;
+            
+            // 表示の更新
+            document.getElementById('totalBudgetLimit').textContent = '¥' + totalBudgetLimit.toLocaleString();
+            document.getElementById('totalBudget').textContent = '¥' + totalCurrentAmount.toLocaleString();
+            document.getElementById('totalBudgetPercentage').textContent = totalUsagePercentage.toFixed(1);
+            document.getElementById('totalBudgetBar').style.width = Math.min(totalUsagePercentage, 100) + '%';
+            
+            // 前年比の表示更新
+            const changeElement = document.getElementById('totalPreviousYearChange');
+            changeElement.textContent = (previousYearChange >= 0 ? '+' : '') + previousYearChange.toFixed(1) + '%';
+            changeElement.className = previousYearChange >= 0 ? 'change-positive' : 'change-negative';
+            
+            // 前年3日間合計の表示更新
+            const totalPreviousDisplay = document.querySelector('.total-budget-card .budget-previous-year small:first-child');
+            if (totalPreviousDisplay) {
+                totalPreviousDisplay.textContent = '前年3日間: ¥' + totalPreviousYear.toLocaleString();
             }
         }
         

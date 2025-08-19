@@ -249,6 +249,70 @@
             background: #d4edda;
             color: #155724;
         }
+        
+        /* バリデーション強化スタイル */
+        .validation-error {
+            border: 2px solid #dc3545 !important;
+            background-color: #f8d7da !important;
+        }
+        
+        .validation-warning {
+            border: 2px solid #ffc107 !important;
+            background-color: #fff3cd !important;
+        }
+        
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .alert {
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+        }
+        
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffecb5;
+        }
+        
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -533,24 +597,31 @@
             let totalSales = 0;
             let totalItems = 0;
             let totalWaste = 0;
+            let validationErrors = [];
             
-            rows.forEach(row => {
+            rows.forEach((row, index) => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > 10) {
                     // 前日残 + 当日入庫 - 販売数 - ロス数 = 当日在庫の自動計算
                     const prevStock = parseInt(cells[4].querySelector('input').value) || 0;
                     const delivery = parseInt(cells[5].querySelector('input').value) || 0;
+                    const movement = parseInt(cells[6].querySelector('input').value) || 0;
                     const sales = parseInt(cells[7].querySelector('input').value) || 0;
                     const waste = parseInt(cells[8].querySelector('input').value) || 0;
                     const unitPrice = parseInt(cells[2].querySelector('input').value) || 0;
+                    const productName = cells[1].querySelector('input').value;
+                    const soldoutTime = cells[12].querySelector('input').value;
                     
-                    // 当日在庫の自動更新
-                    const currentStock = prevStock + delivery - sales - waste;
+                    // バリデーション処理
+                    validateRow(cells, index, productName, prevStock, delivery, movement, sales, waste, soldoutTime, validationErrors);
+                    
+                    // 当日在庫の自動更新（仕様書の計算式）
+                    const currentStock = prevStock + delivery + movement - sales - waste;
                     cells[9].textContent = currentStock;
                     
-                    // 売上額の自動計算
+                    // 構成比計算のための売上額計算
                     const salesAmount = sales * unitPrice;
-                    cells[12].textContent = '¥' + salesAmount.toLocaleString();
+                    cells[13].textContent = '¥' + salesAmount.toLocaleString();
                     
                     totalSales += salesAmount;
                     totalItems += sales;
@@ -558,23 +629,213 @@
                 }
             });
             
+            // 構成比の計算
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 10) {
+                    const sales = parseInt(cells[7].querySelector('input').value) || 0;
+                    const unitPrice = parseInt(cells[2].querySelector('input').value) || 0;
+                    const salesAmount = sales * unitPrice;
+                    const share = totalSales > 0 ? ((salesAmount / totalSales) * 100).toFixed(1) : 0;
+                    cells[14].textContent = share + '%';
+                }
+            });
+            
             // 合計情報の更新
-            const wasteRate = totalItems > 0 ? ((totalWaste / (totalItems + totalWaste)) * 100).toFixed(1) : 0;
+            const wasteRate = (totalItems + totalWaste) > 0 ? ((totalWaste / (totalItems + totalWaste)) * 100).toFixed(1) : 0;
             const summaryElement = document.querySelector('.data-table + div');
             if (summaryElement) {
                 summaryElement.innerHTML = `<strong>合計情報:</strong> 売上額: ¥${totalSales.toLocaleString()} | 総販売数: ${totalItems}個 | 総ロス数: ${totalWaste}個 | ロス率: ${wasteRate}%`;
+            }
+            
+            // バリデーションアラートの更新
+            updateValidationAlerts(validationErrors);
+        }
+        
+        // バリデーション処理（仕様書DAIRY-001準拠）
+        function validateRow(cells, index, productName, prevStock, delivery, movement, sales, waste, soldoutTime, errors) {
+            // ロス比率の異常値チェック（基準値5%）
+            const totalHandled = sales + waste;
+            if (totalHandled > 0) {
+                const wasteRate = (waste / totalHandled) * 100;
+                if (wasteRate > 5.0) {
+                    cells[8].querySelector('input').classList.add('validation-warning');
+                    errors.push(`${productName}: ロス率が基準値(5%)を超えています (${wasteRate.toFixed(1)}%)`);
+                } else {
+                    cells[8].querySelector('input').classList.remove('validation-warning');
+                }
+                
+                // 異常に高いロス率（15%以上）
+                if (wasteRate > 15.0) {
+                    cells[8].querySelector('input').classList.add('validation-error');
+                    errors.push(`${productName}: ロス率が異常に高値です (${wasteRate.toFixed(1)}%)`);
+                }
+            }
+            
+            // 完売時間の範囲チェック（00:00–23:59）
+            if (soldoutTime) {
+                const timePattern = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+                if (!timePattern.test(soldoutTime)) {
+                    cells[12].querySelector('input').classList.add('validation-error');
+                    errors.push(`${productName}: 完売時間の形式が正しくありません (HH:MM形式で入力)`);
+                } else {
+                    cells[12].querySelector('input').classList.remove('validation-error');
+                }
+            }
+            
+            // 在庫マイナスチェック
+            const currentStock = prevStock + delivery + movement - sales - waste;
+            if (currentStock < 0) {
+                [cells[7].querySelector('input'), cells[8].querySelector('input')].forEach(input => {
+                    input.classList.add('validation-error');
+                });
+                errors.push(`${productName}: 在庫がマイナスになっています。販売数またはロス数を確認してください`);
+            }
+            
+            // 完売商品の完売時間未入力チェック
+            if (currentStock === 0 && sales > 0 && !soldoutTime) {
+                cells[12].querySelector('input').classList.add('validation-warning');
+                errors.push(`${productName}: 完売しているようですが完売時間が未入力です`);
+            }
+        }
+        
+        // バリデーションアラートの更新
+        function updateValidationAlerts(errors) {
+            const alertSection = document.querySelector('.form-section h2:contains("アラート") + div');
+            if (!alertSection) return;
+            
+            alertSection.innerHTML = '';
+            
+            if (errors.length === 0) {
+                alertSection.innerHTML = '<div class="alert alert-info"><strong>✓ バリデーション:</strong> すべてのデータが正常です。</div>';
+                return;
+            }
+            
+            errors.forEach(error => {
+                const alertDiv = document.createElement('div');
+                if (error.includes('異常')) {
+                    alertDiv.className = 'alert alert-danger';
+                    alertDiv.innerHTML = `<strong>🚨 エラー:</strong> ${error}`;
+                } else {
+                    alertDiv.className = 'alert alert-warning';
+                    alertDiv.innerHTML = `<strong>⚠️ 警告:</strong> ${error}`;
+                }
+                alertSection.appendChild(alertDiv);
+            });
+        }
+        
+        // 時間帯別売上の自動計算
+        function updateHourlySales() {
+            const hourlyRows = document.querySelectorAll('table:last-of-type tbody tr');
+            let totalHourly = 0;
+            
+            hourlyRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 1) {
+                    const salesInput = cells[1].querySelector('input');
+                    if (salesInput) {
+                        const amount = parseInt(salesInput.value) || 0;
+                        totalHourly += amount;
+                    }
+                }
+            });
+            
+            // 構成比と累計の計算
+            let cumulative = 0;
+            hourlyRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 1) {
+                    const salesInput = cells[1].querySelector('input');
+                    if (salesInput) {
+                        const amount = parseInt(salesInput.value) || 0;
+                        cumulative += amount;
+                        
+                        // 構成比
+                        const share = totalHourly > 0 ? ((amount / totalHourly) * 100).toFixed(1) : 0;
+                        cells[2].textContent = share + '%';
+                        
+                        // 累計
+                        cells[3].textContent = '¥' + cumulative.toLocaleString();
+                    }
+                }
+            });
+            
+            // 時間帯合計の更新
+            const hourlySummary = document.querySelector('.form-section:last-of-type .data-table + div');
+            if (hourlySummary) {
+                // ピーク時間の特定
+                let peakTime = '';
+                let peakAmount = 0;
+                hourlyRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length > 1) {
+                        const timeSlot = cells[0].textContent;
+                        const amount = parseInt(cells[1].querySelector('input')?.value) || 0;
+                        if (amount > peakAmount) {
+                            peakAmount = amount;
+                            peakTime = timeSlot;
+                        }
+                    }
+                });
+                
+                hourlySummary.innerHTML = `<strong>時間帯合計:</strong> ¥${totalHourly.toLocaleString()} | ピーク時間: ${peakTime} (¥${peakAmount.toLocaleString()})`;
             }
         }
         
         // 入力フィールドの変更を監視
         document.addEventListener('input', function(e) {
-            if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
-                updateCalculations();
+            if (e.target.tagName === 'INPUT') {
+                // バリデーション状態をリセット
+                e.target.classList.remove('validation-error', 'validation-warning');
+                
+                if (e.target.type === 'number' || e.target.type === 'time') {
+                    updateCalculations();
+                    updateHourlySales();
+                }
             }
         });
         
-        // 初期計算実行
-        document.addEventListener('DOMContentLoaded', updateCalculations);
+        // 商品追加機能
+        function addProductRow() {
+            const tbody = document.querySelector('.data-table tbody');
+            const newRow = tbody.querySelector('tr').cloneNode(true);
+            
+            // 入力フィールドをクリア
+            newRow.querySelectorAll('input').forEach(input => {
+                input.value = '';
+                input.classList.remove('validation-error', 'validation-warning');
+            });
+            newRow.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            tbody.appendChild(newRow);
+            updateCalculations();
+        }
+        
+        // 時間帯追加機能
+        function addHourlyRow() {
+            const tbody = document.querySelector('table:last-of-type tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" style="width: 100px;" placeholder="HH:MM-HH:MM"></td>
+                <td><input type="number" style="width: 100px;" placeholder="売上額"></td>
+                <td style="background: #f0f0f0;">0.0%</td>
+                <td style="background: #f0f0f0;">¥0</td>
+                <td><button class="btn btn-primary" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;" onclick="this.closest('tr').remove(); updateHourlySales();">削除</button></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCalculations();
+            updateHourlySales();
+            
+            // ボタンイベントの設定
+            document.querySelector('button:contains("商品追加")')?.addEventListener('click', addProductRow);
+            document.querySelector('button:contains("時間追加")')?.addEventListener('click', addHourlyRow);
+        });
     </script>
 </body>
 </html>

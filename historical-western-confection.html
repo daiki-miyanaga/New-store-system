@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>過去洋生ノート確認</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .back-btn {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #2980b9;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* 検索・フィルタセクション */
+        .search-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #d68910;
+        }
+        
+        /* 分析サマリーセクション */
+        .analysis-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .analysis-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+        
+        .analysis-card h4 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+        }
+        
+        .analysis-card p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        /* テーブルセクション */
+        .table-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1600px;
+            font-size: 0.8rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 0.3rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            min-height: 40px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .data-table td {
+            font-size: 0.75rem;
+        }
+        
+        /* 列幅設定 */
+        .col-date { width: 90px; }
+        .col-code { width: 70px; }
+        .col-name { width: 120px; }
+        .col-price { width: 60px; }
+        .col-plan { width: 60px; }
+        .col-order { width: 60px; }
+        .col-move { width: 60px; }
+        .col-after-move { width: 80px; }
+        .col-tasting { width: 60px; }
+        .col-day-stock { width: 80px; }
+        .col-order-remain { width: 80px; }
+        .col-end-stock { width: 80px; }
+        .col-reservation { width: 60px; }
+        .col-special { width: 60px; }
+        .col-forecast { width: 80px; }
+        .col-soldout-time { width: 80px; }
+        
+        /* 商品カテゴリ別のヘッダー */
+        .category-header {
+            background-color: #e8f5e8 !important;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #2c3e50;
+            text-align: left;
+            padding: 0.5rem !important;
+        }
+        
+        /* 日付別のヘッダー */
+        .date-header {
+            background-color: #e3f2fd !important;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #1976d2;
+            text-align: left;
+            padding: 0.5rem !important;
+        }
+        
+        /* 数値比較のハイライト */
+        .increase {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .decrease {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .neutral {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        
+        /* チャートセクション */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        
+        .chart-container h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        /* レスポンシブデザイン */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+            
+            .search-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .analysis-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                font-size: 0.7rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 0.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 過去洋生ノート確認</h1>
+        <a href="index.html" class="back-btn">← メインメニュー</a>
+    </div>
+    
+    <div class="container">
+        <!-- 検索・フィルタセクション -->
+        <div class="search-section">
+            <h2>🔍 検索・フィルタ条件</h2>
+            <div class="search-grid">
+                <div class="form-group">
+                    <label>開始日</label>
+                    <input type="date" id="startDate" value="2024-08-15">
+                </div>
+                <div class="form-group">
+                    <label>終了日</label>
+                    <input type="date" id="endDate" value="2024-08-22">
+                </div>
+                <div class="form-group">
+                    <label>商品カテゴリ</label>
+                    <select id="categoryFilter">
+                        <option value="all">すべて</option>
+                        <option value="denmark">デンマーク関連</option>
+                        <option value="confection">洋菓子限定</option>
+                        <option value="jelly">ゼリー</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>商品検索</label>
+                    <input type="text" id="productSearch" placeholder="商品名で検索">
+                </div>
+                <div class="form-group">
+                    <label>表示方式</label>
+                    <select id="displayMode">
+                        <option value="daily">日別表示</option>
+                        <option value="comparison">比較表示</option>
+                        <option value="summary">サマリー表示</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <button class="btn btn-primary" onclick="searchData()">🔍 検索実行</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 分析サマリーセクション -->
+        <div class="analysis-section">
+            <h2>📊 期間サマリー分析</h2>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h4 id="totalDays">7</h4>
+                    <p>分析日数</p>
+                </div>
+                <div class="analysis-card">
+                    <h4 id="avgDailySales">¥126,000</h4>
+                    <p>平均日次売上</p>
+                </div>
+                <div class="analysis-card">
+                    <h4 id="totalProducts">13</h4>
+                    <p>商品アイテム数</p>
+                </div>
+                <div class="analysis-card">
+                    <h4 id="avgSoldoutTime">18:30</h4>
+                    <p>平均完売時間</p>
+                </div>
+                <div class="analysis-card">
+                    <h4 id="totalReservations">89</h4>
+                    <p>期間予約合計</p>
+                </div>
+                <div class="analysis-card">
+                    <h4 id="totalSpecialOrders">42</h4>
+                    <p>期間特注合計</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- チャート表示セクション -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>📈 日別売上推移</h3>
+                <canvas id="dailySalesChart" width="400" height="200"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>🕐 完売時間分析</h3>
+                <canvas id="soldoutTimeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        
+        <!-- メインデータテーブル -->
+        <div class="table-section">
+            <h2>📋 過去洋生ノートデータ</h2>
+            <div style="margin-bottom: 1rem;">
+                <button class="btn btn-success" onclick="exportToCSV()">📋 CSV出力</button>
+                <button class="btn btn-warning" onclick="compareWithCurrent()">🔄 現在と比較</button>
+                <button class="btn btn-primary" onclick="generateReport()">📊 レポート生成</button>
+            </div>
+            
+            <table class="data-table" id="historicalTable">
+                <thead>
+                    <tr>
+                        <th class="col-date">日付</th>
+                        <th class="col-code">商品C</th>
+                        <th class="col-name">商品名</th>
+                        <th class="col-price">単価</th>
+                        <th class="col-plan">計画数<br>(A)</th>
+                        <th class="col-order">発注数<br>(B)</th>
+                        <th class="col-move">移動数<br>(C)</th>
+                        <th class="col-after-move">移動後在庫<br>(D)</th>
+                        <th class="col-tasting">試食<br>(E)</th>
+                        <th class="col-day-stock">当日在庫残<br>(F)</th>
+                        <th class="col-order-remain">発注残数<br>(G)</th>
+                        <th class="col-end-stock">当日終在庫<br>(H)</th>
+                        <th class="col-reservation">予約<br>(I)</th>
+                        <th class="col-special">特注<br>(J)</th>
+                        <th class="col-forecast">予想/実績</th>
+                        <th class="col-soldout-time">完売時間</th>
+                    </tr>
+                </thead>
+                <tbody id="historicalTableBody">
+                    <!-- サンプルデータ（JavaScriptで動的生成） -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Chart.js ライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // サンプル過去データ（実際のシステムではAPIから取得）
+        const historicalData = [
+            {
+                date: "2024-08-22",
+                weather: "雨",
+                temperature: 25,
+                products: [
+                    {code: "2408", name: "デンマークCC", price: 1200, plan: 8, order: 8, move: 0, tasting: 0, reservation: 2, special: 1, forecast: 8, soldoutTime: "18:30"},
+                    {code: "2479", name: "レアチーズC", price: 1000, plan: 20, order: 20, move: 0, tasting: 0, reservation: 1, special: 0, forecast: 20, soldoutTime: "19:15"},
+                    {code: "2651", name: "カスタードプリン", price: 600, plan: 15, order: 15, move: 0, tasting: 0, reservation: 3, special: 2, forecast: 15, soldoutTime: "17:30"},
+                    {code: "2663", name: "カスタードプリン", price: 350, plan: 24, order: 24, move: 0, tasting: 0, reservation: 2, special: 1, forecast: 24, soldoutTime: "16:45"},
+                    {code: "2664", name: "とろ生カスタード", price: 350, plan: 14, order: 14, move: 0, tasting: 0, reservation: 1, special: 0, forecast: 14, soldoutTime: "15:20"}
+                ]
+            },
+            {
+                date: "2024-08-21",
+                weather: "晴れ",
+                temperature: 28,
+                products: [
+                    {code: "2408", name: "デンマークCC", price: 1200, plan: 10, order: 10, move: 0, tasting: 0, reservation: 3, special: 1, forecast: 10, soldoutTime: "17:45"},
+                    {code: "2479", name: "レアチーズC", price: 1000, plan: 18, order: 18, move: 0, tasting: 0, reservation: 2, special: 0, forecast: 18, soldoutTime: "18:30"},
+                    {code: "2651", name: "カスタードプリン", price: 600, plan: 12, order: 12, move: 0, tasting: 0, reservation: 1, special: 1, forecast: 12, soldoutTime: "19:00"},
+                    {code: "2663", name: "カスタードプリン", price: 350, plan: 20, order: 20, move: 0, tasting: 0, reservation: 1, special: 2, forecast: 20, soldoutTime: "17:15"},
+                    {code: "2664", name: "とろ生カスタード", price: 350, plan: 16, order: 16, move: 0, tasting: 0, reservation: 2, special: 1, forecast: 16, soldoutTime: "16:30"}
+                ]
+            },
+            {
+                date: "2024-08-20",
+                weather: "曇り",
+                temperature: 26,
+                products: [
+                    {code: "2408", name: "デンマークCC", price: 1200, plan: 12, order: 12, move: 0, tasting: 0, reservation: 1, special: 2, forecast: 12, soldoutTime: "19:20"},
+                    {code: "2479", name: "レアチーズC", price: 1000, plan: 22, order: 22, move: 0, tasting: 0, reservation: 3, special: 1, forecast: 22, soldoutTime: "18:45"},
+                    {code: "2651", name: "カスタードプリン", price: 600, plan: 18, order: 18, move: 0, tasting: 0, reservation: 2, special: 0, forecast: 18, soldoutTime: "17:20"},
+                    {code: "2663", name: "カスタードプリン", price: 350, plan: 26, order: 26, move: 0, tasting: 0, reservation: 1, special: 1, forecast: 26, soldoutTime: "16:00"},
+                    {code: "2664", name: "とろ生カスタード", price: 350, plan: 12, order: 12, move: 0, tasting: 0, reservation: 0, special: 1, forecast: 12, soldoutTime: "18:10"}
+                ]
+            }
+        ];
+        
+        // データ表示機能
+        function displayHistoricalData(data = historicalData) {
+            const tbody = document.getElementById('historicalTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(dayData => {
+                // 日付ヘッダー行
+                const dateRow = document.createElement('tr');
+                dateRow.innerHTML = `<td class="date-header" colspan="16">${dayData.date} (${dayData.weather}, ${dayData.temperature}℃)</td>`;
+                tbody.appendChild(dateRow);
+                
+                // 商品データ行
+                dayData.products.forEach(product => {
+                    const row = document.createElement('tr');
+                    const afterMove = product.order + product.move;
+                    const dayStock = afterMove - product.tasting;
+                    const endStock = dayStock - product.forecast;
+                    
+                    row.innerHTML = `
+                        <td>${dayData.date}</td>
+                        <td>${product.code}</td>
+                        <td>${product.name}</td>
+                        <td>¥${product.price.toLocaleString()}</td>
+                        <td>${product.plan}</td>
+                        <td>${product.order}</td>
+                        <td>${product.move}</td>
+                        <td>${afterMove}</td>
+                        <td>${product.tasting}</td>
+                        <td>${dayStock}</td>
+                        <td>0</td>
+                        <td>${endStock}</td>
+                        <td>${product.reservation}</td>
+                        <td>${product.special}</td>
+                        <td>${product.forecast}</td>
+                        <td>${product.soldoutTime}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+        
+        // 分析サマリーの更新
+        function updateAnalysisSummary(data = historicalData) {
+            const totalDays = data.length;
+            let totalSales = 0;
+            let totalReservations = 0;
+            let totalSpecialOrders = 0;
+            let soldoutTimes = [];
+            let productCount = 0;
+            
+            data.forEach(dayData => {
+                let dailySales = 0;
+                dayData.products.forEach(product => {
+                    dailySales += product.forecast * product.price;
+                    totalReservations += product.reservation;
+                    totalSpecialOrders += product.special;
+                    if (product.soldoutTime) {
+                        soldoutTimes.push(product.soldoutTime);
+                    }
+                });
+                totalSales += dailySales;
+                if (productCount < dayData.products.length) {
+                    productCount = dayData.products.length;
+                }
+            });
+            
+            const avgDailySales = Math.round(totalSales / totalDays);
+            const avgSoldoutTime = calculateAverageSoldoutTime(soldoutTimes);
+            
+            document.getElementById('totalDays').textContent = totalDays;
+            document.getElementById('avgDailySales').textContent = '¥' + avgDailySales.toLocaleString();
+            document.getElementById('totalProducts').textContent = productCount;
+            document.getElementById('avgSoldoutTime').textContent = avgSoldoutTime;
+            document.getElementById('totalReservations').textContent = totalReservations;
+            document.getElementById('totalSpecialOrders').textContent = totalSpecialOrders;
+        }
+        
+        // 平均完売時間の計算
+        function calculateAverageSoldoutTime(times) {
+            if (times.length === 0) return '-';
+            
+            let totalMinutes = 0;
+            times.forEach(time => {
+                const [hours, minutes] = time.split(':').map(Number);
+                totalMinutes += hours * 60 + minutes;
+            });
+            
+            const avgMinutes = Math.round(totalMinutes / times.length);
+            const avgHours = Math.floor(avgMinutes / 60);
+            const remainingMinutes = avgMinutes % 60;
+            
+            return `${avgHours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}`;
+        }
+        
+        // 検索機能
+        function searchData() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const productSearch = document.getElementById('productSearch').value.toLowerCase();
+            const displayMode = document.getElementById('displayMode').value;
+            
+            let filteredData = historicalData.filter(dayData => {
+                const dayDate = dayData.date;
+                return dayDate >= startDate && dayDate <= endDate;
+            });
+            
+            // 商品フィルタリング
+            if (categoryFilter !== 'all' || productSearch) {
+                filteredData = filteredData.map(dayData => {
+                    let filteredProducts = dayData.products;
+                    
+                    if (productSearch) {
+                        filteredProducts = filteredProducts.filter(product => 
+                            product.name.toLowerCase().includes(productSearch)
+                        );
+                    }
+                    
+                    return {
+                        ...dayData,
+                        products: filteredProducts
+                    };
+                });
+            }
+            
+            displayHistoricalData(filteredData);
+            updateAnalysisSummary(filteredData);
+            updateCharts(filteredData);
+        }
+        
+        // チャート作成
+        function createCharts() {
+            // 日別売上推移チャート
+            const salesCtx = document.getElementById('dailySalesChart').getContext('2d');
+            const salesData = historicalData.map(dayData => {
+                let dailySales = 0;
+                dayData.products.forEach(product => {
+                    dailySales += product.forecast * product.price;
+                });
+                return dailySales;
+            });
+            
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: historicalData.map(d => d.date),
+                    datasets: [{
+                        label: '日別売上',
+                        data: salesData,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 完売時間分析チャート
+            const timeCtx = document.getElementById('soldoutTimeChart').getContext('2d');
+            const timeSlots = {
+                '15:00-16:00': 0,
+                '16:00-17:00': 0,
+                '17:00-18:00': 0,
+                '18:00-19:00': 0,
+                '19:00-20:00': 0
+            };
+            
+            historicalData.forEach(dayData => {
+                dayData.products.forEach(product => {
+                    if (product.soldoutTime) {
+                        const hour = parseInt(product.soldoutTime.split(':')[0]);
+                        if (hour >= 15 && hour < 16) timeSlots['15:00-16:00']++;
+                        else if (hour >= 16 && hour < 17) timeSlots['16:00-17:00']++;
+                        else if (hour >= 17 && hour < 18) timeSlots['17:00-18:00']++;
+                        else if (hour >= 18 && hour < 19) timeSlots['18:00-19:00']++;
+                        else if (hour >= 19 && hour < 20) timeSlots['19:00-20:00']++;
+                    }
+                });
+            });
+            
+            new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(timeSlots),
+                    datasets: [{
+                        label: '完売件数',
+                        data: Object.values(timeSlots),
+                        backgroundColor: '#27ae60'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // チャート更新
+        function updateCharts(data) {
+            // 実装省略（新しいデータでチャートを再描画）
+        }
+        
+        // CSV出力機能
+        function exportToCSV() {
+            const table = document.getElementById('historicalTable');
+            let csv = [];
+            
+            for (let row of table.rows) {
+                let csvRow = [];
+                for (let cell of row.cells) {
+                    csvRow.push(cell.textContent.replace(/,/g, ''));
+                }
+                csv.push(csvRow.join(','));
+            }
+            
+            const csvString = csv.join('\n');
+            const blob = new Blob([csvString], {type: 'text/csv'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `過去洋生ノート_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        // 現在と比較機能
+        function compareWithCurrent() {
+            // 現在の洋生ノートデータと比較する機能
+            alert('現在の洋生ノートデータとの比較機能を実装予定');
+        }
+        
+        // レポート生成機能
+        function generateReport() {
+            // 詳細なレポートを生成する機能
+            alert('詳細レポート生成機能を実装予定');
+        }
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            displayHistoricalData();
+            updateAnalysisSummary();
+            createCharts();
+        });
+    </script>
+</body>
+</html>

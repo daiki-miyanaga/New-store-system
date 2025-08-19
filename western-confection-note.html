@@ -109,7 +109,7 @@
         .main-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1400px;
+            min-width: 1600px;
             font-size: 0.8rem;
         }
         
@@ -156,8 +156,10 @@
         .col-day-stock { width: 80px; }
         .col-order-remain { width: 80px; }
         .col-end-stock { width: 80px; }
+        .col-reservation { width: 60px; }
+        .col-special { width: 60px; }
         .col-forecast { width: 80px; }
-        .col-time { width: 80px; }
+        .col-soldout-time { width: 80px; }
         
         /* 商品カテゴリ別のヘッダー */
         .category-header {
@@ -353,14 +355,16 @@
                         <th class="col-day-stock">当日在庫残<br>(F)</th>
                         <th class="col-order-remain">発注残数<br>(G)</th>
                         <th class="col-end-stock">当日終在庫<br>(H)</th>
+                        <th class="col-reservation">予約<br>(I)</th>
+                        <th class="col-special">特注<br>(J)</th>
                         <th class="col-forecast">予想/実績</th>
-                        <th class="col-time">出品定時間</th>
+                        <th class="col-soldout-time">完売時間</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- デンマーク関連 -->
                     <tr>
-                        <td class="category-header" colspan="13">＜ デンマーク関連 ＞</td>
+                        <td class="category-header" colspan="15">＜ デンマーク関連 ＞</td>
                     </tr>
                     <tr>
                         <td>2408</td>
@@ -374,8 +378,10 @@
                         <td class="auto-calc">8</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="8"></td>
+                        <td><input type="number" value="2"></td>
+                        <td><input type="number" value="1"></td>
                         <td><input type="number" value="8"></td>
-                        <td><input type="time" value="10:00"></td>
+                        <td><input type="time" value="18:30"></td>
                     </tr>
                     <tr>
                         <td>2479</td>
@@ -389,13 +395,15 @@
                         <td class="auto-calc">20</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="20"></td>
+                        <td><input type="number" value="1"></td>
+                        <td><input type="number" value="0"></td>
                         <td><input type="number" value="20"></td>
-                        <td><input type="time" value="10:00"></td>
+                        <td><input type="time" value="19:15"></td>
                     </tr>
                     
                     <!-- 洋菓子限定 -->
                     <tr>
-                        <td class="category-header" colspan="13">＜ 洋菓子限定 ＞</td>
+                        <td class="category-header" colspan="15">＜ 洋菓子限定 ＞</td>
                     </tr>
                     <tr>
                         <td>2651</td>
@@ -409,8 +417,10 @@
                         <td class="auto-calc">15</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="15"></td>
+                        <td><input type="number" value="3"></td>
+                        <td><input type="number" value="2"></td>
                         <td><input type="number" value="15"></td>
-                        <td><input type="time" value="11:00"></td>
+                        <td><input type="time" value="17:30"></td>
                     </tr>
                     <tr>
                         <td>2663</td>
@@ -424,8 +434,10 @@
                         <td class="auto-calc">24</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="24"></td>
+                        <td><input type="number" value="2"></td>
+                        <td><input type="number" value="1"></td>
                         <td><input type="number" value="24"></td>
-                        <td><input type="time" value="12:00"></td>
+                        <td><input type="time" value="16:45"></td>
                     </tr>
                     <tr>
                         <td>2664</td>
@@ -439,8 +451,10 @@
                         <td class="auto-calc">14</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="14"></td>
+                        <td><input type="number" value="1"></td>
+                        <td><input type="number" value="0"></td>
                         <td><input type="number" value="14"></td>
-                        <td><input type="time" value="13:00"></td>
+                        <td><input type="time" value="15:20"></td>
                     </tr>
                     <tr>
                         <td>2666</td>
@@ -454,8 +468,10 @@
                         <td class="auto-calc">14</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="14"></td>
+                        <td><input type="number" value="0"></td>
+                        <td><input type="number" value="1"></td>
                         <td><input type="number" value="14"></td>
-                        <td><input type="time" value="14:00"></td>
+                        <td><input type="time" value="18:00"></td>
                     </tr>
                     <tr>
                         <td>2667</td>
@@ -469,8 +485,10 @@
                         <td class="auto-calc">14</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="14"></td>
+                        <td><input type="number" value="1"></td>
+                        <td><input type="number" value="2"></td>
                         <td><input type="number" value="14"></td>
-                        <td><input type="time" value="15:00"></td>
+                        <td><input type="time" value="17:45"></td>
                     </tr>
                     <tr>
                         <td>2668</td>
@@ -484,8 +502,10 @@
                         <td class="auto-calc">24</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="24"></td>
+                        <td><input type="number" value="0"></td>
+                        <td><input type="number" value="0"></td>
                         <td><input type="number" value="24"></td>
-                        <td><input type="time" value="16:00"></td>
+                        <td><input type="time"></td>
                     </tr>
                     <tr>
                         <td>2619</td>
@@ -498,6 +518,8 @@
                         <td><input type="number" value="0"></td>
                         <td class="auto-calc">0</td>
                         <td class="auto-calc">0</td>
+                        <td><input type="number" value="0"></td>
+                        <td><input type="number" value="0"></td>
                         <td><input type="number" value="0"></td>
                         <td><input type="number" value="0"></td>
                         <td>-</td>
@@ -514,13 +536,15 @@
                         <td class="auto-calc">14</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="14"></td>
+                        <td><input type="number" value="2"></td>
+                        <td><input type="number" value="1"></td>
                         <td><input type="number" value="14"></td>
-                        <td><input type="time" value="17:00"></td>
+                        <td><input type="time" value="19:20"></td>
                     </tr>
                     
                     <!-- ゼリー -->
                     <tr>
-                        <td class="category-header" colspan="13">＜ ゼリー ＞</td>
+                        <td class="category-header" colspan="15">＜ ゼリー ＞</td>
                     </tr>
                     <tr>
                         <td>2604</td>
@@ -534,8 +558,10 @@
                         <td class="auto-calc">12</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="12"></td>
+                        <td><input type="number" value="1"></td>
+                        <td><input type="number" value="0"></td>
                         <td><input type="number" value="12"></td>
-                        <td><input type="time" value="18:00"></td>
+                        <td><input type="time"></td>
                     </tr>
                     <tr>
                         <td>2605</td>
@@ -549,13 +575,15 @@
                         <td class="auto-calc">12</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="12"></td>
+                        <td><input type="number" value="0"></td>
+                        <td><input type="number" value="1"></td>
                         <td><input type="number" value="12"></td>
-                        <td><input type="time" value="19:00"></td>
+                        <td><input type="time" value="20:15"></td>
                     </tr>
                     
                     <!-- その他 -->
                     <tr>
-                        <td class="category-header" colspan="13">＜ その他 ＞</td>
+                        <td class="category-header" colspan="15">＜ その他 ＞</td>
                     </tr>
                     <tr>
                         <td>2601</td>
@@ -569,8 +597,10 @@
                         <td class="auto-calc">14</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="14"></td>
+                        <td><input type="number" value="1"></td>
+                        <td><input type="number" value="1"></td>
                         <td><input type="number" value="14"></td>
-                        <td><input type="time" value="20:00"></td>
+                        <td><input type="time" value="18:45"></td>
                     </tr>
                     <tr>
                         <td>2350</td>
@@ -584,8 +614,10 @@
                         <td class="auto-calc">10</td>
                         <td class="auto-calc">0</td>
                         <td><input type="number" value="10"></td>
+                        <td><input type="number" value="5"></td>
+                        <td><input type="number" value="3"></td>
                         <td><input type="number" value="15000"></td>
-                        <td><input type="time" value="21:00"></td>
+                        <td><input type="time" value="19:45"></td>
                     </tr>
                     
                     <!-- 合計行 -->
@@ -599,6 +631,8 @@
                         <td><strong id="totalDayStock">244</strong></td>
                         <td><strong id="totalOrderRemain">0</strong></td>
                         <td><strong id="totalEndStock">244</strong></td>
+                        <td><strong id="totalReservation">17</strong></td>
+                        <td><strong id="totalSpecial">12</strong></td>
                         <td><strong>¥126,000</strong></td>
                         <td>-</td>
                     </tr>
@@ -652,22 +686,28 @@
             let totalPlan = 0;
             let totalOrder = 0;
             let totalMove = 0;
+            let totalReservation = 0;
+            let totalSpecial = 0;
             let totalAmount = 0;
             
             const rows = document.querySelectorAll('.main-table tbody tr:not(.total-row):not([class*="category-header"])');
             
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length >= 13 && !row.querySelector('.category-header')) {
+                if (cells.length >= 15 && !row.querySelector('.category-header')) {
                     const price = parseInt(cells[2].textContent) || 0;
                     const planInput = cells[3].querySelector('input');
                     const orderInput = cells[4].querySelector('input');
                     const moveInput = cells[5].querySelector('input');
+                    const reservationInput = cells[11].querySelector('input');
+                    const specialInput = cells[12].querySelector('input');
                     
-                    if (planInput && orderInput && moveInput) {
+                    if (planInput && orderInput && moveInput && reservationInput && specialInput) {
                         const planValue = parseInt(planInput.value) || 0;
                         const orderValue = parseInt(orderInput.value) || 0;
                         const moveValue = parseInt(moveInput.value) || 0;
+                        const reservationValue = parseInt(reservationInput.value) || 0;
+                        const specialValue = parseInt(specialInput.value) || 0;
                         
                         // 移動後在庫の計算
                         const afterMoveCell = cells[6];
@@ -686,6 +726,8 @@
                         if (!isNaN(planValue)) totalPlan += planValue;
                         if (!isNaN(orderValue)) totalOrder += orderValue;
                         if (!isNaN(moveValue)) totalMove += moveValue;
+                        if (!isNaN(reservationValue)) totalReservation += reservationValue;
+                        if (!isNaN(specialValue)) totalSpecial += specialValue;
                         totalAmount += orderValue * price;
                     }
                 }
@@ -700,6 +742,8 @@
             document.getElementById('totalDayStock').textContent = totalOrder;
             document.getElementById('totalOrderRemain').textContent = 0;
             document.getElementById('totalEndStock').textContent = totalOrder;
+            document.getElementById('totalReservation').textContent = totalReservation;
+            document.getElementById('totalSpecial').textContent = totalSpecial;
             
             // サマリーの更新
             document.getElementById('summaryPlanCount').textContent = totalPlan;
@@ -737,6 +781,8 @@
                 <td><input type="number" value="0"></td>
                 <td class="auto-calc">0</td>
                 <td class="auto-calc">0</td>
+                <td><input type="number" value="0"></td>
+                <td><input type="number" value="0"></td>
                 <td><input type="number" value="0"></td>
                 <td><input type="number" value="0"></td>
                 <td><input type="time"></td>

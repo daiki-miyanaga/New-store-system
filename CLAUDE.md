@@ -501,3 +501,153 @@ orderRemainCell.textContent = 0; // 基本的に0
 - **NOTE-001準拠**: 洋生ノート仕様 100%実装
 - **表形式管理**: 既存業務フローとの完全互換性
 - **自動計算機能**: 業務効率化とミス防止 100%対応
+
+---
+
+## 2025-08-19 洋生ノート列構成変更・機能拡張
+
+### 追加要求内容
+ユーザーから「洋生ノートについて　出品定時間を完売時間に変更。カラムに予約、特注項目を追加」という追加要求に対応し、表の列構成を13列から15列に拡張。
+
+### 実装内容
+
+#### 1. 列構成の変更
+**変更前（13列）:**
+- 商品C、商品名、単価、計画数(A)、発注数(B)、移動数(C)、移動後在庫(D)、試食(E)、当日在庫残(F)、発注残数(G)、当日終在庫(H)、予想/実績、**出品定時間**
+
+**変更後（15列）:**
+- 商品C、商品名、単価、計画数(A)、発注数(B)、移動数(C)、移動後在庫(D)、試食(E)、当日在庫残(F)、発注残数(G)、当日終在庫(H)、**予約(I)**、**特注(J)**、予想/実績、**完売時間**
+
+#### 2. 列ヘッダーの更新
+```html
+<th class="col-reservation">予約<br>(I)</th>
+<th class="col-special">特注<br>(J)</th>
+<th class="col-forecast">予想/実績</th>
+<th class="col-soldout-time">完売時間</th>
+```
+
+#### 3. CSS調整
+- **テーブル最小幅**: 1400px → 1600px に拡張
+- **新列幅設定**: 
+  - .col-reservation: 60px（予約列）
+  - .col-special: 60px（特注列）
+  - .col-soldout-time: 80px（完売時間列）
+- **カテゴリヘッダー**: colspan="13" → colspan="15" に更新
+
+#### 4. 自動計算機能の拡張
+```javascript
+function updateCalculations() {
+    let totalReservation = 0;
+    let totalSpecial = 0;
+    
+    // 各行から予約・特注の値を取得
+    const reservationValue = parseInt(reservationInput.value) || 0;
+    const specialValue = parseInt(specialInput.value) || 0;
+    
+    // 合計に追加
+    totalReservation += reservationValue;
+    totalSpecial += specialValue;
+    
+    // 合計行の更新
+    document.getElementById('totalReservation').textContent = totalReservation;
+    document.getElementById('totalSpecial').textContent = totalSpecial;
+}
+```
+
+#### 5. 商品行への新フィールド追加
+全13商品に対して以下の新フィールドを追加：
+```html
+<td><input type="number" value="予約数"></td>  <!-- 予約(I) -->
+<td><input type="number" value="特注数"></td>  <!-- 特注(J) -->
+<td><input type="time" value="完売時間"></td>  <!-- 完売時間 -->
+```
+
+#### 6. 商品追加機能の更新
+addProductRow()関数を15列対応に更新：
+```javascript
+function addProductRow() {
+    newRow.innerHTML = `
+        // ... 既存の11列 ...
+        <td><input type="number" value="0"></td>     <!-- 予約 -->
+        <td><input type="number" value="0"></td>     <!-- 特注 -->
+        <td><input type="number" value="0"></td>     <!-- 予想/実績 -->
+        <td><input type="time"></td>                 <!-- 完売時間 -->
+    `;
+}
+```
+
+#### 7. 合計行の更新
+```html
+<tr class="total-row">
+    <td colspan="3"><strong>合計金額</strong></td>
+    <!-- ... 既存の8列 ... -->
+    <td><strong id="totalReservation">17</strong></td>   <!-- 予約合計 -->
+    <td><strong id="totalSpecial">12</strong></td>       <!-- 特注合計 -->
+    <td><strong>¥126,000</strong></td>                   <!-- 金額合計 -->
+    <td>-</td>                                            <!-- 完売時間は合計なし -->
+</tr>
+```
+
+### 列の意味・用途
+
+#### 1. 予約(I)列
+- **用途**: 事前予約による確定注文数
+- **データ型**: 数値入力
+- **計算**: 合計予約数を自動集計
+- **ビジネス価値**: 確実な売上の事前把握
+
+#### 2. 特注(J)列
+- **用途**: 特別注文・カスタム商品の数量
+- **データ型**: 数値入力  
+- **計算**: 合計特注数を自動集計
+- **ビジネス価値**: 特別対応売上の管理
+
+#### 3. 完売時間列（旧：出品定時間）
+- **変更理由**: 「いつ出品するか」より「いつ完売したか」の方が重要な実績データ
+- **用途**: 商品完売時刻の記録
+- **データ型**: 時刻入力（HH:MM形式）
+- **ビジネス価値**: 売上予測と発注計画の精度向上
+
+### レスポンシブ対応の調整
+```css
+@media (max-width: 768px) {
+    .main-table {
+        min-width: 1600px; /* モバイルでも15列の情報を確保 */
+        font-size: 0.7rem;  /* フォントサイズ縮小で表示最適化 */
+    }
+}
+```
+
+### ビジネス価値の向上
+
+#### 1. データ粒度の向上
+- **予約管理**: 事前確定売上の詳細把握
+- **特注対応**: カスタム商品の売上管理
+- **完売分析**: 商品ごとの売上パターン分析
+
+#### 2. 運用効率の改善
+- **予約集約**: 予約数の自動集計機能
+- **特注追跡**: 特別対応商品の数量管理
+- **実績記録**: 完売時間による売上予測精度向上
+
+#### 3. 意思決定支援の強化
+- **発注計画**: 予約・特注を考慮した発注数決定
+- **在庫管理**: 確定売上分を除いた在庫管理
+- **売上予測**: 完売時間データによる翌日予測
+
+### 技術実装の完了項目
+1. ✅ 「出品定時間」→「完売時間」の列ヘッダー変更
+2. ✅ 「予約(I)」列の追加（数値入力、自動合計）
+3. ✅ 「特注(J)」列の追加（数値入力、自動合計）
+4. ✅ テーブル幅の1400px→1600pxへの拡張
+5. ✅ 全カテゴリヘッダーのcolspan更新（13→15）
+6. ✅ 全商品行への新フィールド追加（13商品×2列）
+7. ✅ 自動計算機能の15列対応更新
+8. ✅ 商品追加機能の15列対応更新
+9. ✅ 合計行の新列対応更新
+10. ✅ 変更内容のCLAUDE.md記録
+
+### システム仕様適合度
+- **NOTE-001準拠**: 洋生ノート仕様 100%実装→更なる機能拡張
+- **データ管理強化**: 13列→15列への拡張完了
+- **予約・特注管理**: 新規業務要件への完全対応

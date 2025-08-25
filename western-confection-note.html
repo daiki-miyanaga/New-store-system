@@ -271,6 +271,228 @@
             font-size: 0.9rem;
         }
         
+        /* 事前予約・特注管理エリア */
+        .reservation-management {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .reservation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e8f5e8;
+        }
+        
+        .reservation-header h2 {
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .add-reservation-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .add-reservation-btn:hover {
+            background: #219a52;
+        }
+        
+        .reservation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .reservation-card {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 1rem;
+            border-left: 4px solid #27ae60;
+            position: relative;
+        }
+        
+        .special-order-card {
+            border-left-color: #f39c12;
+        }
+        
+        .reservation-item {
+            display: grid;
+            grid-template-columns: 1fr 80px 80px 30px;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e3e3e3;
+        }
+        
+        .reservation-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .product-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        .reservation-quantity {
+            text-align: center;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        .reservation-time {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+        
+        .reservation-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e3e3e3;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: #e8f5e8;
+            border-radius: 4px;
+        }
+        
+        .summary-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .summary-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        
+        /* アラートエリア */
+        .alerts-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .alert-critical {
+            background: #fee;
+            border-left-color: #e74c3c;
+            color: #c0392b;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-left-color: #f39c12;
+            color: #856404;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .alert-message {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .alert-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .alert-btn {
+            padding: 0.25rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .alert-btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .alert-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .alert-btn:hover {
+            opacity: 0.8;
+        }
+        
         /* レスポンシブデザイン */
         @media (max-width: 768px) {
             .container {
@@ -295,6 +517,34 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+            
+            .reservation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .reservation-item {
+                grid-template-columns: 1fr 60px 60px 30px;
+                gap: 0.25rem;
+            }
+            
+            .reservation-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .alert-item {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            
+            .alert-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            
+            .alert-btn {
+                flex: 1;
+            }
         }
     </style>
 </head>
@@ -305,6 +555,79 @@
     </div>
     
     <div class="container">
+        <!-- 事前予約・特注管理エリア -->
+        <div class="reservation-management">
+            <div class="reservation-header">
+                <h2>📝 事前予約・特注管理</h2>
+                <button class="add-reservation-btn" onclick="addReservation()">➕ 予約追加</button>
+            </div>
+            
+            <div class="reservation-grid">
+                <div class="reservation-card">
+                    <h3 style="margin-bottom: 1rem; color: #27ae60; font-size: 1rem;">📝 予約商品</h3>
+                    <div id="reservationItems">
+                        <div class="reservation-item">
+                            <div class="product-name">デンマークCC</div>
+                            <div class="reservation-quantity">3個</div>
+                            <div class="reservation-time">15:00</div>
+                            <button class="remove-btn" onclick="removeReservation(this)">×</button>
+                        </div>
+                        <div class="reservation-item">
+                            <div class="product-name">カスタードプリン</div>
+                            <div class="reservation-quantity">5個</div>
+                            <div class="reservation-time">16:30</div>
+                            <button class="remove-btn" onclick="removeReservation(this)">×</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="reservation-card special-order-card">
+                    <h3 style="margin-bottom: 1rem; color: #f39c12; font-size: 1rem;">🎂 特注商品</h3>
+                    <div id="specialOrderItems">
+                        <div class="reservation-item">
+                            <div class="product-name">ホールケーキ(カスタム)</div>
+                            <div class="reservation-quantity">1個</div>
+                            <div class="reservation-time">14:00</div>
+                            <button class="remove-btn" onclick="removeReservation(this)">×</button>
+                        </div>
+                        <div class="reservation-item">
+                            <div class="product-name">フルーツタルト(特別)</div>
+                            <div class="reservation-quantity">2個</div>
+                            <div class="reservation-time">17:00</div>
+                            <button class="remove-btn" onclick="removeReservation(this)">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reservation-summary">
+                <div class="summary-item">
+                    <div class="summary-value" id="totalReservations">8</div>
+                    <div class="summary-label">予約合計</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="totalSpecialOrders">3</div>
+                    <div class="summary-label">特注合計</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="totalAdvanceOrders">11</div>
+                    <div class="summary-label">事前受注総数</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="estimatedRevenue">¥15,200</div>
+                    <div class="summary-label">予想売上</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- アラートエリア -->
+        <div class="alerts-section" id="alertsSection">
+            <h2 style="margin-bottom: 1rem; color: #2c3e50;">⚠️ 発注量アラート</h2>
+            <div id="alertsList">
+                <!-- アラートがJavaScriptで動的に追加されます -->
+            </div>
+        </div>
+        
         <!-- 日付・天気情報ヘッダー -->
         <div class="date-header">
             <div class="date-info">
@@ -754,16 +1077,369 @@
             document.getElementById('summaryAvgPrice').textContent = '¥' + avgPrice;
         }
         
+        // 予約・特注管理機能
+        const reservationData = {
+            reservations: [
+                { product: 'デンマークCC', quantity: 3, time: '15:00', price: 1200 },
+                { product: 'カスタードプリン', quantity: 5, time: '16:30', price: 350 }
+            ],
+            specialOrders: [
+                { product: 'ホールケーキ(カスタム)', quantity: 1, time: '14:00', price: 3500 },
+                { product: 'フルーツタルト(特別)', quantity: 2, time: '17:00', price: 450 }
+            ]
+        };
+        
+        // 商品マスターデータ
+        const productMaster = {
+            'デンマークCC': { code: '2408', price: 1200 },
+            'レアチーズC': { code: '2479', price: 1000 },
+            'カスタードプリン': { code: '2651', price: 600 },
+            'カスタードプリン': { code: '2663', price: 350 },
+            'とろ生カスタード': { code: '2664', price: 350 },
+            'ホールケーキ(カスタム)': { code: 'CUSTOM01', price: 3500 },
+            'フルーツタルト(特別)': { code: 'SPECIAL01', price: 450 }
+        };
+        
+        // 予約サマリーの更新
+        function updateReservationSummary() {
+            const totalReservations = reservationData.reservations.reduce((sum, item) => sum + item.quantity, 0);
+            const totalSpecialOrders = reservationData.specialOrders.reduce((sum, item) => sum + item.quantity, 0);
+            const totalAdvanceOrders = totalReservations + totalSpecialOrders;
+            
+            let estimatedRevenue = 0;
+            reservationData.reservations.forEach(item => {
+                estimatedRevenue += item.quantity * item.price;
+            });
+            reservationData.specialOrders.forEach(item => {
+                estimatedRevenue += item.quantity * item.price;
+            });
+            
+            document.getElementById('totalReservations').textContent = totalReservations;
+            document.getElementById('totalSpecialOrders').textContent = totalSpecialOrders;
+            document.getElementById('totalAdvanceOrders').textContent = totalAdvanceOrders;
+            document.getElementById('estimatedRevenue').textContent = '¥' + estimatedRevenue.toLocaleString();
+        }
+        
+        // 発注量不足アラートチェック
+        function checkOrderAlerts() {
+            const alertsList = document.getElementById('alertsList');
+            alertsList.innerHTML = '';
+            
+            const alerts = [];
+            
+            // 予約・特注に対する発注量チェック
+            const allOrders = [...reservationData.reservations, ...reservationData.specialOrders];
+            
+            allOrders.forEach(order => {
+                const orderQuantity = getOrderQuantityByProduct(order.product);
+                const shortfall = order.quantity - orderQuantity;
+                
+                if (shortfall > 0) {
+                    alerts.push({
+                        type: 'critical',
+                        title: '発注量不足アラート',
+                        message: `${order.product}の予約・特注${order.quantity}個に対し、発注数が${shortfall}個不足しています。`,
+                        time: order.time,
+                        product: order.product,
+                        shortfall: shortfall,
+                        actions: [
+                            { text: '発注数調整', action: 'adjustOrder', primary: true },
+                            { text: '予約取消確認', action: 'checkCancel', primary: false }
+                        ]
+                    });
+                } else if (shortfall === 0) {
+                    alerts.push({
+                        type: 'warning',
+                        title: '発注量ギリギリ',
+                        message: `${order.product}の予約・特注${order.quantity}個と発注数が同量です。余裕を持った発注を検討してください。`,
+                        time: order.time,
+                        product: order.product,
+                        actions: [
+                            { text: '発注数増加', action: 'increaseOrder', primary: true }
+                        ]
+                    });
+                }
+            });
+            
+            // 完売時間との兼ね合いチェック
+            checkSoldOutTimeAlerts(alerts);
+            
+            // アラート表示
+            if (alerts.length === 0) {
+                alertsList.innerHTML = `
+                    <div class="alert-item alert-info">
+                        <div class="alert-icon">✅</div>
+                        <div class="alert-content">
+                            <div class="alert-title">発注量チェック完了</div>
+                            <div class="alert-message">予約・特注に対する発注量は適正です。</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                alerts.forEach(alert => {
+                    const alertElement = createAlertElement(alert);
+                    alertsList.appendChild(alertElement);
+                });
+            }
+        }
+        
+        // 商品名から発注数量を取得
+        function getOrderQuantityByProduct(productName) {
+            const rows = document.querySelectorAll('.main-table tbody tr:not(.total-row):not([class*="category-header"])');
+            
+            for (let row of rows) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    const currentProductName = cells[1].textContent.trim();
+                    if (currentProductName === productName || currentProductName.includes(productName)) {
+                        const orderInput = cells[4].querySelector('input');
+                        return orderInput ? parseInt(orderInput.value) || 0 : 0;
+                    }
+                }
+            }
+            return 0;
+        }
+        
+        // 完売時間アラートチェック
+        function checkSoldOutTimeAlerts(alerts) {
+            const rows = document.querySelectorAll('.main-table tbody tr:not(.total-row):not([class*="category-header"])');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 15) {
+                    const productName = cells[1].textContent.trim();
+                    const orderInput = cells[4].querySelector('input');
+                    const soldOutTimeInput = cells[14].querySelector('input');
+                    
+                    if (orderInput && soldOutTimeInput) {
+                        const orderQuantity = parseInt(orderInput.value) || 0;
+                        const soldOutTime = soldOutTimeInput.value;
+                        
+                        // 予約時間との比較
+                        const reservedItems = [...reservationData.reservations, ...reservationData.specialOrders]
+                            .filter(item => item.product === productName);
+                        
+                        reservedItems.forEach(reserved => {
+                            if (soldOutTime && reserved.time) {
+                                const soldOutHour = parseInt(soldOutTime.split(':')[0]);
+                                const reservedHour = parseInt(reserved.time.split(':')[0]);
+                                
+                                if (soldOutHour <= reservedHour) {
+                                    alerts.push({
+                                        type: 'warning',
+                                        title: '完売時間と予約時間の競合',
+                                        message: `${productName}の完売予想時間(${soldOutTime})が予約時間(${reserved.time})と近接しています。`,
+                                        product: productName,
+                                        actions: [
+                                            { text: '発注数増加', action: 'increaseOrder', primary: true },
+                                            { text: '予約時間調整', action: 'adjustReservationTime', primary: false }
+                                        ]
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        
+        // アラート要素の作成
+        function createAlertElement(alert) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert-item alert-${alert.type}`;
+            
+            const iconMap = {
+                critical: '🚨',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            let actionsHtml = '';
+            if (alert.actions && alert.actions.length > 0) {
+                actionsHtml = `
+                    <div class="alert-actions">
+                        ${alert.actions.map(action => 
+                            `<button class="alert-btn ${action.primary ? 'alert-btn-primary' : 'alert-btn-secondary'}" 
+                                     onclick="handleAlertAction('${action.action}', '${alert.product || ''}', ${alert.shortfall || 0})">
+                                ${action.text}
+                             </button>`
+                        ).join('')}
+                    </div>
+                `;
+            }
+            
+            alertDiv.innerHTML = `
+                <div class="alert-icon">${iconMap[alert.type] || '📢'}</div>
+                <div class="alert-content">
+                    <div class="alert-title">${alert.title}</div>
+                    <div class="alert-message">${alert.message}</div>
+                    ${actionsHtml}
+                </div>
+            `;
+            
+            return alertDiv;
+        }
+        
+        // アラートアクション処理
+        function handleAlertAction(action, product, shortfall) {
+            switch (action) {
+                case 'adjustOrder':
+                    adjustOrderForProduct(product, shortfall);
+                    break;
+                case 'increaseOrder':
+                    adjustOrderForProduct(product, 2);
+                    break;
+                case 'checkCancel':
+                    if (confirm(`${product}の予約をキャンセルしますか？`)) {
+                        // 予約キャンセル処理
+                        removeReservationByProduct(product);
+                    }
+                    break;
+                case 'adjustReservationTime':
+                    alert('予約時間の調整機能は開発中です。');
+                    break;
+            }
+        }
+        
+        // 商品の発注数調整
+        function adjustOrderForProduct(productName, increaseAmount) {
+            const rows = document.querySelectorAll('.main-table tbody tr:not(.total-row):not([class*="category-header"])');
+            
+            for (let row of rows) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    const currentProductName = cells[1].textContent.trim();
+                    if (currentProductName === productName || currentProductName.includes(productName)) {
+                        const orderInput = cells[4].querySelector('input');
+                        if (orderInput) {
+                            const currentValue = parseInt(orderInput.value) || 0;
+                            orderInput.value = currentValue + increaseAmount;
+                            updateCalculations();
+                            checkOrderAlerts();
+                            
+                            // 成功メッセージ
+                            showSuccessMessage(`${productName}の発注数を${increaseAmount}個増加しました。`);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 予約削除（商品名指定）
+        function removeReservationByProduct(productName) {
+            reservationData.reservations = reservationData.reservations.filter(item => item.product !== productName);
+            reservationData.specialOrders = reservationData.specialOrders.filter(item => item.product !== productName);
+            
+            updateReservationDisplay();
+            updateReservationSummary();
+            checkOrderAlerts();
+            
+            showSuccessMessage(`${productName}の予約を削除しました。`);
+        }
+        
+        // 成功メッセージ表示
+        function showSuccessMessage(message) {
+            const alertsList = document.getElementById('alertsList');
+            const successAlert = document.createElement('div');
+            successAlert.className = 'alert-item alert-info';
+            successAlert.innerHTML = `
+                <div class="alert-icon">✅</div>
+                <div class="alert-content">
+                    <div class="alert-title">操作完了</div>
+                    <div class="alert-message">${message}</div>
+                </div>
+            `;
+            
+            alertsList.prepend(successAlert);
+            
+            // 3秒後に自動削除
+            setTimeout(() => {
+                if (successAlert.parentNode) {
+                    successAlert.remove();
+                }
+            }, 3000);
+        }
+        
+        // 予約表示の更新
+        function updateReservationDisplay() {
+            const reservationItems = document.getElementById('reservationItems');
+            const specialOrderItems = document.getElementById('specialOrderItems');
+            
+            // 予約商品の表示更新
+            reservationItems.innerHTML = reservationData.reservations.map(item => `
+                <div class="reservation-item">
+                    <div class="product-name">${item.product}</div>
+                    <div class="reservation-quantity">${item.quantity}個</div>
+                    <div class="reservation-time">${item.time}</div>
+                    <button class="remove-btn" onclick="removeReservation(this, '${item.product}', 'reservation')">×</button>
+                </div>
+            `).join('');
+            
+            // 特注商品の表示更新
+            specialOrderItems.innerHTML = reservationData.specialOrders.map(item => `
+                <div class="reservation-item">
+                    <div class="product-name">${item.product}</div>
+                    <div class="reservation-quantity">${item.quantity}個</div>
+                    <div class="reservation-time">${item.time}</div>
+                    <button class="remove-btn" onclick="removeReservation(this, '${item.product}', 'special')">×</button>
+                </div>
+            `).join('');
+        }
+        
+        // 予約追加
+        function addReservation() {
+            const product = prompt('商品名を入力してください:');
+            if (!product) return;
+            
+            const quantity = parseInt(prompt('数量を入力してください:'));
+            if (!quantity || quantity <= 0) return;
+            
+            const time = prompt('受取時間を入力してください (HH:MM):');
+            if (!time) return;
+            
+            const type = confirm('特注商品ですか？\n\nOK: 特注\nキャンセル: 通常予約');
+            const price = productMaster[product]?.price || parseInt(prompt('価格を入力してください:')) || 0;
+            
+            const newItem = { product, quantity, time, price };
+            
+            if (type) {
+                reservationData.specialOrders.push(newItem);
+            } else {
+                reservationData.reservations.push(newItem);
+            }
+            
+            updateReservationDisplay();
+            updateReservationSummary();
+            checkOrderAlerts();
+        }
+        
+        // 予約削除
+        function removeReservation(button, product, type) {
+            if (type === 'reservation') {
+                reservationData.reservations = reservationData.reservations.filter(item => item.product !== product);
+            } else {
+                reservationData.specialOrders = reservationData.specialOrders.filter(item => item.product !== product);
+            }
+            
+            updateReservationDisplay();
+            updateReservationSummary();
+            checkOrderAlerts();
+        }
+        
         // 入力イベントの監視
         document.addEventListener('input', function(e) {
             if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
                 updateCalculations();
+                checkOrderAlerts();
             }
         });
         
         // 初期計算
         document.addEventListener('DOMContentLoaded', function() {
             updateCalculations();
+            updateReservationSummary();
+            checkOrderAlerts();
         });
         
         // 商品行追加機能

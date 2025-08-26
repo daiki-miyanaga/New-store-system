@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在庫管理システム - ダッシュボード | MOC Architecture</title>
+    
+    <!-- MOC Base Styles -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body>
+    <!-- Dashboard will be mounted here -->
+    <div id="dashboard-root"></div>
+    
+    <!-- Loading indicator -->
+    <div id="dashboard-loading" class="dashboard-loading" style="display: none;">
+        <div class="dashboard-loading-spinner"></div>
+        <div class="dashboard-loading-text">ダッシュボードを読み込み中...</div>
+    </div>
+    
+    <!-- Error state -->
+    <div id="dashboard-error" class="dashboard-error" style="display: none;">
+        <div class="dashboard-error-icon">⚠️</div>
+        <div class="dashboard-error-message">ダッシュボードの読み込みに失敗しました</div>
+        <button class="dashboard-retry-btn" onclick="initializeDashboard()">再試行</button>
+    </div>
+    
+    <!-- Refresh indicator -->
+    <div id="refresh-indicator" class="dashboard-refresh-indicator">
+        🔄 データを更新中...
+    </div>
+    
+    <!-- MOC Core Components -->
+    <script src="src/utils/EventBus.js"></script>
+    <script src="src/stores/AppStore.js"></script>
+    <script src="src/services/InventoryService.js"></script>
+    
+    <!-- MOC UI Components -->
+    <script src="src/components/ui/Card.js"></script>
+    <script src="src/components/ui/Table.js"></script>
+    <script src="src/components/ui/Chart.js"></script>
+    <script src="src/components/ui/Alert.js"></script>
+    <script src="src/components/ui/Form.js"></script>
+    
+    <!-- MOC Layout Components -->
+    <script src="src/components/layout/Header.js"></script>
+    
+    <!-- MOC Dashboard Page -->
+    <script src="src/pages/dashboard/Dashboard.js"></script>
+    
+    <script>
+        // Global application state
+        let dashboard = null;
+        let isLoading = false;
+        
+        /**
+         * アプリケーションの初期化
+         */
+        async function initializeDashboard() {
+            if (isLoading) return;
+            
+            try {
+                isLoading = true;
+                showLoading();
+                
+                // Dashboard instance creation
+                dashboard = new Dashboard({
+                    container: '#dashboard-root',
+                    autoRefresh: true,
+                    refreshInterval: 60000
+                });
+                
+                // Initialize dashboard
+                await dashboard.init();
+                
+                // Navigation cards construction
+                dashboard.buildNavigationCards();
+                
+                hideLoading();
+                
+                // Setup global event listeners
+                setupGlobalEventListeners();
+                
+                // Debug information
+                console.log('🚀 MOC Dashboard initialized successfully');
+                console.log('📊 Components loaded:', {
+                    EventBus: !!window.eventBus,
+                    AppStore: !!window.appStore,
+                    Card: !!window.Card,
+                    Table: !!window.Table,
+                    Chart: !!window.MOCChart,
+                    Alert: !!window.Alert,
+                    Form: !!window.Form,
+                    Header: !!window.Header
+                });
+                
+            } catch (error) {
+                console.error('Dashboard initialization failed:', error);
+                showError();
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        /**
+         * ローディング表示
+         */
+        function showLoading() {
+            document.getElementById('dashboard-loading').style.display = 'flex';
+            document.getElementById('dashboard-error').style.display = 'none';
+            document.getElementById('dashboard-root').style.display = 'none';
+        }
+        
+        /**
+         * ローディング非表示
+         */
+        function hideLoading() {
+            document.getElementById('dashboard-loading').style.display = 'none';
+            document.getElementById('dashboard-root').style.display = 'block';
+        }
+        
+        /**
+         * エラー表示
+         */
+        function showError() {
+            document.getElementById('dashboard-loading').style.display = 'none';
+            document.getElementById('dashboard-error').style.display = 'flex';
+            document.getElementById('dashboard-root').style.display = 'none';
+        }
+        
+        /**
+         * リフレッシュインジケーター表示
+         */
+        function showRefreshIndicator() {
+            const indicator = document.getElementById('refresh-indicator');
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+        
+        /**
+         * グローバルイベントリスナーの設定
+         */
+        function setupGlobalEventListeners() {
+            // Data refresh events
+            if (window.eventBus) {
+                window.eventBus.on('dashboard.refresh.start', showRefreshIndicator);
+                
+                window.eventBus.on('dashboard.refresh.success', () => {
+                    console.log('📊 Dashboard refreshed successfully');
+                });
+                
+                window.eventBus.on('dashboard.refresh.error', (error) => {
+                    console.error('❌ Dashboard refresh failed:', error);
+                    Alert.error('データの更新に失敗しました').mount();
+                });
+            }
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + R for manual refresh
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (dashboard) {
+                        dashboard.refresh();
+                    }
+                }
+                
+                // F5 for full reload
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    location.reload();
+                }
+            });
+            
+            // Performance monitoring
+            if (window.performance && window.performance.mark) {
+                window.performance.mark('dashboard-ready');
+            }
+            
+            // Page visibility change handling
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && dashboard) {
+                    // Page became visible, refresh data if stale
+                    const lastUpdate = dashboard.lastUpdateTime || 0;
+                    const staleThreshold = 5 * 60 * 1000; // 5 minutes
+                    
+                    if (Date.now() - lastUpdate > staleThreshold) {
+                        dashboard.refresh();
+                    }
+                }
+            });
+        }
+        
+        /**
+         * ページ読み込み完了後の初期化
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Performance timing
+            const startTime = performance.now();
+            
+            // Initialize application
+            initializeDashboard().then(() => {
+                const endTime = performance.now();
+                console.log(`⚡ Dashboard loaded in ${(endTime - startTime).toFixed(2)}ms`);
+                
+                // Welcome message for development
+                if (window.location.search.includes('debug=true')) {
+                    Alert.success('🎉 MOC Dashboard loaded successfully!', {
+                        autoClose: 3000
+                    }).mount();
+                }
+            });
+        });
+        
+        /**
+         * Error handling
+         */
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            
+            if (window.Alert) {
+                Alert.error('予期しないエラーが発生しました。ページを再読み込みしてください。').mount();
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            e.preventDefault();
+        });
+        
+        // Export for debugging
+        if (window.location.search.includes('debug=true')) {
+            window.dashboard = dashboard;
+            window.mocDebug = {
+                refresh: () => dashboard?.refresh(),
+                destroy: () => dashboard?.destroy(),
+                getKPIData: () => dashboard?.kpiData,
+                getChartData: () => dashboard?.chartData,
+                showTestAlert: () => Alert.success('Test alert').mount(),
+                getStats: () => ({
+                    eventBusStats: window.eventBus?.getStats(),
+                    appStoreDebug: window.appStore?.getDebugInfo(),
+                    componentsLoaded: Object.keys(window).filter(key => 
+                        ['Card', 'Table', 'MOCChart', 'Alert', 'Form', 'Header'].includes(key)
+                    )
+                })
+            };
+            
+            console.log('🔧 Debug mode enabled. Use window.mocDebug for debugging.');
+        }
+    </script>
+    
+    <!-- Service Worker registration for offline support (optional) -->
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            navigator.serviceWorker.register('/sw.js').then((registration) => {
+                console.log('SW registered: ', registration);
+            }).catch((registrationError) => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        }
+    </script>
+</body>
+</html>

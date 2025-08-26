@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用方法マニュアル | 在庫管理システム - MOC Architecture</title>
+    
+    <!-- MOC Base Styles -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+    
+    <style>
+    /* Manual専用スタイル */
+    .manual-layout {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    }
+
+    .manual-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--spacing-xl);
+    }
+
+    .manual-header {
+        text-align: center;
+        padding: var(--spacing-3xl) 0;
+        margin-bottom: var(--spacing-2xl);
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+    }
+
+    .manual-title {
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-md);
+        background: linear-gradient(45deg, var(--color-secondary), var(--color-info));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .manual-subtitle {
+        font-size: var(--font-size-xl);
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .manual-version {
+        display: inline-block;
+        background: var(--color-success-light);
+        color: var(--color-success-dark);
+        padding: var(--spacing-xs) var(--spacing-md);
+        border-radius: var(--border-radius-full);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    /* Navigation */
+    .manual-nav {
+        position: sticky;
+        top: var(--spacing-lg);
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+    }
+
+    .manual-nav h3 {
+        margin-bottom: var(--spacing-md);
+        color: var(--text-primary);
+        font-size: var(--font-size-lg);
+    }
+
+    .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-item {
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .nav-link {
+        display: block;
+        padding: var(--spacing-sm) var(--spacing-md);
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: var(--border-radius-md);
+        transition: all var(--transition-base);
+        font-size: var(--font-size-sm);
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        background: var(--color-secondary-light);
+        color: var(--color-secondary-dark);
+        transform: translateX(8px);
+    }
+
+    /* Content */
+    .manual-content {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-2xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        line-height: 1.7;
+    }
+
+    .section {
+        margin-bottom: var(--spacing-3xl);
+        padding-bottom: var(--spacing-2xl);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-lg);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .section-icon {
+        font-size: var(--font-size-3xl);
+    }
+
+    .subsection {
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .subsection-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-md);
+        padding-left: var(--spacing-lg);
+        border-left: 4px solid var(--color-secondary);
+    }
+
+    /* Screenshots */
+    .screenshot {
+        width: 100%;
+        max-width: 800px;
+        margin: var(--spacing-lg) auto;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+    }
+
+    .screenshot-placeholder {
+        height: 400px;
+        background: var(--color-gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: var(--font-size-lg);
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius-lg);
+        margin: var(--spacing-lg) 0;
+    }
+
+    /* Step Lists */
+    .step-list {
+        counter-reset: step-counter;
+        list-style: none;
+        padding: 0;
+        margin: var(--spacing-lg) 0;
+    }
+
+    .step-item {
+        counter-increment: step-counter;
+        margin-bottom: var(--spacing-lg);
+        padding: var(--spacing-lg);
+        background: var(--color-gray-25);
+        border-radius: var(--border-radius-lg);
+        border-left: 4px solid var(--color-info);
+        position: relative;
+    }
+
+    .step-item::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: -20px;
+        top: var(--spacing-lg);
+        width: 40px;
+        height: 40px;
+        background: var(--color-info);
+        color: var(--color-white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: var(--font-weight-bold);
+        font-size: var(--font-size-lg);
+    }
+
+    .step-title {
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-sm);
+        margin-left: var(--spacing-lg);
+    }
+
+    .step-description {
+        color: var(--text-secondary);
+        margin-left: var(--spacing-lg);
+    }
+
+    /* Feature Cards */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+        margin: var(--spacing-xl) 0;
+    }
+
+    .feature-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-xl);
+        box-shadow: var(--shadow-md);
+        transition: all var(--transition-base);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .feature-icon {
+        font-size: var(--font-size-4xl);
+        margin-bottom: var(--spacing-md);
+        text-align: center;
+    }
+
+    .feature-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-sm);
+        text-align: center;
+    }
+
+    .feature-description {
+        color: var(--text-secondary);
+        text-align: center;
+        font-size: var(--font-size-sm);
+    }
+
+    /* Key Points */
+    .key-points {
+        background: var(--color-warning-light);
+        border: 1px solid var(--color-warning);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-lg);
+        margin: var(--spacing-lg) 0;
+    }
+
+    .key-points-title {
+        color: var(--color-warning-dark);
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--spacing-md);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .key-points ul {
+        margin: 0;
+        padding-left: var(--spacing-lg);
+        color: var(--color-warning-dark);
+    }
+
+    .key-points li {
+        margin-bottom: var(--spacing-xs);
+    }
+
+    /* Tips */
+    .tip {
+        background: var(--color-info-light);
+        border: 1px solid var(--color-info);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-lg);
+        margin: var(--spacing-lg) 0;
+    }
+
+    .tip-title {
+        color: var(--color-info-dark);
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--spacing-sm);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .tip-content {
+        color: var(--color-info-dark);
+        margin: 0;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        position: fixed;
+        bottom: var(--spacing-lg);
+        right: var(--spacing-lg);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        z-index: var(--z-modal);
+    }
+
+    .quick-action {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--color-secondary);
+        color: var(--color-white);
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--font-size-xl);
+        transition: all var(--transition-base);
+    }
+
+    .quick-action:hover {
+        background: var(--color-secondary-dark);
+        transform: scale(1.1);
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .manual-container {
+            padding: var(--spacing-lg);
+        }
+
+        .manual-header {
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .manual-title {
+            font-size: var(--font-size-2xl);
+        }
+
+        .manual-subtitle {
+            font-size: var(--font-size-lg);
+        }
+
+        .manual-content {
+            padding: var(--spacing-lg);
+        }
+
+        .section-title {
+            font-size: var(--font-size-xl);
+        }
+
+        .subsection-title {
+            font-size: var(--font-size-lg);
+        }
+
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .step-item {
+            margin-left: var(--spacing-lg);
+        }
+
+        .quick-actions {
+            display: none;
+        }
+    }
+
+    /* Print Support */
+    @media print {
+        .manual-layout {
+            background: white;
+        }
+
+        .manual-nav,
+        .quick-actions {
+            display: none;
+        }
+
+        .manual-content {
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+
+        .section {
+            break-inside: avoid;
+        }
+
+        .screenshot-placeholder {
+            border: 1px solid #000;
+            background: #f5f5f5;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="manual-layout">
+        <div class="manual-container">
+            <!-- Header -->
+            <header class="manual-header">
+                <h1 class="manual-title">📖 在庫管理システム</h1>
+                <p class="manual-subtitle">MOC Architecture - 使用方法マニュアル</p>
+                <span class="manual-version">Version 2.0</span>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="manual-nav">
+                <h3>📋 目次</h3>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#overview" class="nav-link">システム概要</a></li>
+                    <li class="nav-item"><a href="#getting-started" class="nav-link">はじめに</a></li>
+                    <li class="nav-item"><a href="#dashboard" class="nav-link">ダッシュボード</a></li>
+                    <li class="nav-item"><a href="#performance-input" class="nav-link">実績入力</a></li>
+                    <li class="nav-item"><a href="#order-simulation" class="nav-link">発注シミュレーション</a></li>
+                    <li class="nav-item"><a href="#western-confection" class="nav-link">洋生ノート</a></li>
+                    <li class="nav-item"><a href="#historical-analysis" class="nav-link">過去データ分析</a></li>
+                    <li class="nav-item"><a href="#keyboard-shortcuts" class="nav-link">キーボードショートカット</a></li>
+                    <li class="nav-item"><a href="#troubleshooting" class="nav-link">トラブルシューティング</a></li>
+                </ul>
+            </nav>
+
+            <!-- Content -->
+            <main class="manual-content">
+                <!-- システム概要 -->
+                <section id="overview" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🌟</span>
+                        システム概要
+                    </h2>
+
+                    <p>MOC (Mock-up Object Components) アーキテクチャを採用した次世代在庫管理システムです。従来の手書き管理表を完全デジタル化し、データドリブンな店舗運営を支援します。</p>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3 class="feature-title">リアルタイムKPI</h3>
+                            <p class="feature-description">売上、在庫、ロス率などの重要指標をリアルタイムで把握</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔄</div>
+                            <h3 class="feature-title">自動計算</h3>
+                            <p class="feature-description">在庫計算、発注最適化、構成比分析を自動実行</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📱</div>
+                            <h3 class="feature-title">レスポンシブ対応</h3>
+                            <p class="feature-description">PC、タブレット、スマートフォンで最適表示</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔗</div>
+                            <h3 class="feature-title">システム連携</h3>
+                            <p class="feature-description">各モジュール間の seamless なデータ連携</p>
+                        </div>
+                    </div>
+
+                    <div class="key-points">
+                        <div class="key-points-title">
+                            <span>⚡</span>
+                            主要な特徴
+                        </div>
+                        <ul>
+                            <li>手書き管理表からの完全移行対応</li>
+                            <li>自動保存機能による作業ロス防止</li>
+                            <li>CSV入出力による外部システム連携</li>
+                            <li>アクセシビリティ対応による使いやすさ</li>
+                            <li>デバッグモードによる開発者サポート</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- はじめに -->
+                <section id="getting-started" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🚀</span>
+                        はじめに
+                    </h2>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">初回アクセス</h3>
+                        
+                        <ol class="step-list">
+                            <li class="step-item">
+                                <div class="step-title">ブラウザでアクセス</div>
+                                <div class="step-description">Chrome、Firefox、Safari、Edgeなどの最新ブラウザで `index-moc.html` にアクセスします。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">ダッシュボード確認</div>
+                                <div class="step-description">システムの全体概要とKPIカードが表示されることを確認します。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">ナビゲーション確認</div>
+                                <div class="step-description">ヘッダーメニューから各機能にアクセスできることを確認します。</div>
+                            </li>
+                        </ol>
+
+                        <div class="screenshot-placeholder">
+                            📸 ダッシュボード初期画面
+                        </div>
+                    </div>
+
+                    <div class="tip">
+                        <div class="tip-title">
+                            <span>💡</span>
+                            はじめてのご利用
+                        </div>
+                        <p class="tip-content">デバッグモードを有効にするには、URLに `?debug=true` を追加してアクセスしてください。詳細なログとデバッグ機能が利用できます。</p>
+                    </div>
+                </section>
+
+                <!-- ダッシュボード -->
+                <section id="dashboard" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">📊</span>
+                        ダッシュボード
+                    </h2>
+
+                    <p>システムの中央管理画面です。重要なKPIと各機能へのアクセスポイントを提供します。</p>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">KPIカード</h3>
+                        
+                        <ul>
+                            <li><strong>客数:</strong> 当日の来客数とトレンド</li>
+                            <li><strong>売上:</strong> 当日売上とトレンド表示</li>
+                            <li><strong>在庫合計:</strong> 現在の総在庫金額</li>
+                            <li><strong>完売件数:</strong> 完売した商品数</li>
+                            <li><strong>予算進捗:</strong> 予算に対する使用率</li>
+                        </ul>
+
+                        <div class="screenshot-placeholder">
+                            📸 KPIカード表示例
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">リアルタイムチャート</h3>
+                        
+                        <ul>
+                            <li><strong>時間帯別売上:</strong> 1時間ごとの売上推移（棒グラフ）</li>
+                            <li><strong>カテゴリ構成比:</strong> 商品カテゴリ別の売上構成（ドーナツチャート）</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">操作方法</h3>
+                        
+                        <ol class="step-list">
+                            <li class="step-item">
+                                <div class="step-title">自動更新</div>
+                                <div class="step-description">データは1分間隔で自動更新されます。手動更新する場合はCtrl+Rを押してください。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">ナビゲーション</div>
+                                <div class="step-description">ナビゲーションカードをクリックして各機能にアクセスします。</div>
+                            </li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- 実績入力 -->
+                <section id="performance-input" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">📝</span>
+                        実績入力
+                    </h2>
+
+                    <p>日々の売上実績と在庫データを入力・管理する機能です。自動計算とリアルタイムバリデーションを提供します。</p>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">基本操作</h3>
+                        
+                        <ol class="step-list">
+                            <li class="step-item">
+                                <div class="step-title">日付・天気・気温の入力</div>
+                                <div class="step-description">対象日、天気、気温を最初に設定します。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">商品別データ入力</div>
+                                <div class="step-description">前日残、入荷、販売数、ロス数を入力すると当日在庫が自動計算されます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">時間帯別売上入力</div>
+                                <div class="step-description">売上金額と客数を入力すると構成比と累計が自動計算されます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">データ保存</div>
+                                <div class="step-description">30秒間隔で自動保存されます。手動保存は💾ボタンまたはCtrl+Sで実行できます。</div>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">バリデーション機能</h3>
+                        
+                        <ul>
+                            <li><strong>ロス率チェック:</strong> 5%基準値、15%以上で異常値として警告</li>
+                            <li><strong>完売時間:</strong> HH:MM形式での時刻入力チェック</li>
+                            <li><strong>在庫計算:</strong> 負の値にならないよう自動調整</li>
+                        </ul>
+
+                        <div class="screenshot-placeholder">
+                            📸 実績入力画面とバリデーション表示
+                        </div>
+                    </div>
+
+                    <div class="key-points">
+                        <div class="key-points-title">
+                            <span>⚠️</span>
+                            重要なポイント
+                        </div>
+                        <ul>
+                            <li>入力データは即座にバリデーションされます</li>
+                            <li>エラーがある場合は該当フィールドが赤色で表示されます</li>
+                            <li>未保存データがある場合は画面上部に警告が表示されます</li>
+                            <li>発注システムと同期ボタンで他システムにデータを送信できます</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 発注シミュレーション -->
+                <section id="order-simulation" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🔄</span>
+                        発注シミュレーション
+                    </h2>
+
+                    <p>最適な発注数量をシミュレーションし、予算管理と構成比調整を行う機能です。</p>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">予算管理</h3>
+                        
+                        <ol class="step-list">
+                            <li class="step-item">
+                                <div class="step-title">3日間予算設定</div>
+                                <div class="step-description">本日・翌日・翌々日の予算をそれぞれ設定します。KPIカードをクリックして編集できます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">実績データ同期</div>
+                                <div class="step-description">実績入力システムから在庫データを取得して発注計算に反映します。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">対象日選択</div>
+                                <div class="step-description">本日・翌日・翌々日から発注対象日を選択します。</div>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">発注計算方式</h3>
+                        
+                        <ul>
+                            <li><strong>構成比ベース:</strong> 各商品の構成比（0-50%）から発注数を自動計算</li>
+                            <li><strong>数量ベース:</strong> 直接発注数を入力して金額を計算</li>
+                        </ul>
+
+                        <div class="screenshot-placeholder">
+                            📸 構成比スライダーと発注計算画面
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">制約チェック</h3>
+                        
+                        <ul>
+                            <li><strong>最小発注数:</strong> 商品ごとの最小発注数をチェック</li>
+                            <li><strong>発注倍数:</strong> 発注単位（ケース数等）をチェック</li>
+                            <li><strong>予算制約:</strong> 設定した予算を超えないよう制御</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip">
+                        <div class="tip-title">
+                            <span>💡</span>
+                            効果的な使用方法
+                        </div>
+                        <p class="tip-content">構成比ベースでの発注計算では、過去の売上データを参考に構成比を設定することで、バランスの取れた発注が可能です。</p>
+                    </div>
+                </section>
+
+                <!-- 洋生ノート -->
+                <section id="western-confection" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🧁</span>
+                        洋生ノート
+                    </h2>
+
+                    <p>洋菓子専用の詳細管理表です。手書き管理表を完全デジタル化し、15列の詳細データを管理します。</p>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">表の構成（15列）</h3>
+                        
+                        <ol>
+                            <li><strong>商品C:</strong> 商品コード</li>
+                            <li><strong>商品名:</strong> 商品名称</li>
+                            <li><strong>単価:</strong> 販売単価</li>
+                            <li><strong>計画数(A):</strong> 計画販売数</li>
+                            <li><strong>発注数(B):</strong> 実際の発注数</li>
+                            <li><strong>移動数(C):</strong> 店舗間移動数</li>
+                            <li><strong>移動後在庫(D):</strong> B + C（自動計算）</li>
+                            <li><strong>試食(E):</strong> 試食提供数</li>
+                            <li><strong>当日在庫残(F):</strong> 当日在庫数（自動計算）</li>
+                            <li><strong>発注残数(G):</strong> 発注残り数</li>
+                            <li><strong>当日終在庫(H):</strong> 当日終了時在庫（自動計算）</li>
+                            <li><strong>予約(I):</strong> 事前予約数</li>
+                            <li><strong>特注(J):</strong> 特別注文数</li>
+                            <li><strong>予想/実績:</strong> 予想または実績売上数</li>
+                            <li><strong>完売時間:</strong> 完売した時刻（HH:MM形式）</li>
+                        </ol>
+
+                        <div class="screenshot-placeholder">
+                            📸 洋生ノート15列管理表
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">自動計算項目</h3>
+                        
+                        <ul>
+                            <li><strong>移動後在庫(D):</strong> 発注数(B) + 移動数(C)</li>
+                            <li><strong>当日在庫残(F):</strong> 移動後在庫(D)</li>
+                            <li><strong>当日終在庫(H):</strong> 当日在庫残(F) - 試食(E) - 実績売上</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">操作方法</h3>
+                        
+                        <ol class="step-list">
+                            <li class="step-item">
+                                <div class="step-title">ヘッダー情報入力</div>
+                                <div class="step-description">対象日、天気、気温を入力します。日付変更時は曜日が自動更新されます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">商品データ入力</div>
+                                <div class="step-description">各商品の計画数、発注数、移動数等を入力します。計算項目は自動更新されます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">商品追加</div>
+                                <div class="step-description">➕商品追加ボタンで新しい商品行を追加できます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">データ保存・出力</div>
+                                <div class="step-description">自動保存機能に加え、CSV出力、実績入力への送信が可能です。</div>
+                            </li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- 過去データ分析 -->
+                <section id="historical-analysis" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">📈</span>
+                        過去データ分析
+                    </h2>
+
+                    <p>過去のデータを分析し、トレンドの把握と将来予測を行う機能です。</p>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">検索・フィルタ</h3>
+                        
+                        <ul>
+                            <li><strong>期間指定:</strong> 開始日〜終了日での範囲検索（最大365日）</li>
+                            <li><strong>カテゴリフィルタ:</strong> デンマーク関連、洋菓子限定、ゼリー、その他での絞り込み</li>
+                            <li><strong>商品名検索:</strong> 商品名での部分一致検索</li>
+                            <li><strong>表示方式:</strong> 日別表示、比較表示、サマリー表示の切り替え</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">分析チャート</h3>
+                        
+                        <ol class="step-list">
+                            <li class="step-item">
+                                <div class="step-title">日別売上推移</div>
+                                <div class="step-description">指定期間の日別売上をライングラフで表示。トレンドとピークを把握できます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">完売時間分析</div>
+                                <div class="step-description">時間帯別の完売件数を棒グラフで表示。売れ筋時間帯を特定できます。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">カテゴリ構成比</div>
+                                <div class="step-description">商品カテゴリ別の売上構成をドーナツチャートで表示。</div>
+                            </li>
+                            <li class="step-item">
+                                <div class="step-title">月次売上比較</div>
+                                <div class="step-description">月ごとの売上比較を棒グラフで表示。季節性を把握できます。</div>
+                            </li>
+                        </ol>
+
+                        <div class="screenshot-placeholder">
+                            📸 過去データ分析チャート群
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">AI売上予測</h3>
+                        
+                        <ul>
+                            <li><strong>予測期間:</strong> 7日、14日、30日から選択</li>
+                            <li><strong>予測精度:</strong> 信頼度75-95%で表示</li>
+                            <li><strong>考慮要素:</strong> 過去の売上傾向、季節性、曜日パターン</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip">
+                        <div class="tip-title">
+                            <span>💡</span>
+                            分析のコツ
+                        </div>
+                        <p class="tip-content">30日程度の期間で分析を行うと、週次トレンドと月次トレンドの両方を把握できます。特別なイベント期間は除外して分析することをお勧めします。</p>
+                    </div>
+                </section>
+
+                <!-- キーボードショートカット -->
+                <section id="keyboard-shortcuts" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">⌨️</span>
+                        キーボードショートカット
+                    </h2>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">共通ショートカット</h3>
+                        
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid var(--border-color);">
+                            <thead>
+                                <tr style="background: var(--color-gray-100);">
+                                    <th style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">キー</th>
+                                    <th style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">機能</th>
+                                    <th style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">対象画面</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);"><code>Ctrl + R</code></td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">データ更新</td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">全画面</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);"><code>F5</code></td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">ページ再読み込み</td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">全画面</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);"><code>Ctrl + S</code></td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">データ保存</td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">実績入力、洋生ノート</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);"><code>Ctrl + E</code></td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">CSV出力</td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">全画面</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);"><code>Ctrl + Enter</code></td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">計算実行・検索実行</td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">発注シミュレーション、過去データ分析</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);"><code>Ctrl + N</code></td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">新規追加</td>
+                                    <td style="padding: var(--spacing-sm); border: 1px solid var(--border-color);">洋生ノート</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- トラブルシューティング -->
+                <section id="troubleshooting" class="section">
+                    <h2 class="section-title">
+                        <span class="section-icon">🔧</span>
+                        トラブルシューティング
+                    </h2>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">よくある問題</h3>
+                        
+                        <div class="key-points">
+                            <div class="key-points-title">
+                                <span>❌</span>
+                                ページが表示されない
+                            </div>
+                            <ul>
+                                <li>ブラウザのJavaScriptが有効になっているか確認</li>
+                                <li>ブラウザのキャッシュをクリア（Ctrl + Shift + Delete）</li>
+                                <li>別のブラウザで試行</li>
+                                <li>開発者ツール（F12）でエラーを確認</li>
+                            </ul>
+                        </div>
+
+                        <div class="key-points">
+                            <div class="key-points-title">
+                                <span>❌</span>
+                                データが保存されない
+                            </div>
+                            <ul>
+                                <li>ブラウザのローカルストレージが有効になっているか確認</li>
+                                <li>プライベートブラウジングモードを無効化</li>
+                                <li>手動保存（Ctrl + S）を試行</li>
+                                <li>ブラウザの容量制限を確認</li>
+                            </ul>
+                        </div>
+
+                        <div class="key-points">
+                            <div class="key-points-title">
+                                <span>❌</span>
+                                計算結果がおかしい
+                            </div>
+                            <ul>
+                                <li>入力値に全角文字が含まれていないか確認</li>
+                                <li>必須項目がすべて入力されているか確認</li>
+                                <li>再計算ボタン（🧮）を押して再計算</li>
+                                <li>ページをリロード（F5）して再試行</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">デバッグモード</h3>
+                        
+                        <p>URLに `?debug=true` を追加してアクセスすると、詳細なデバッグ情報が利用できます。</p>
+
+                        <ul>
+                            <li><strong>コンソールログ:</strong> F12でブラウザの開発者ツールを開き、Consoleタブで詳細ログを確認</li>
+                            <li><strong>デバッグコマンド:</strong> `window.mocDebug` から各種デバッグコマンドを実行</li>
+                            <li><strong>統計情報:</strong> `getStats()` でシステムの状態を確認</li>
+                        </ul>
+
+                        <div class="screenshot-placeholder">
+                            📸 デバッグモード画面例
+                        </div>
+                    </div>
+
+                    <div class="tip">
+                        <div class="tip-title">
+                            <span>💡</span>
+                            サポート情報
+                        </div>
+                        <p class="tip-content">問題が解決しない場合は、ブラウザの種類・バージョン、エラーメッセージ、再現手順を記録してシステム管理者にお問い合わせください。</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="quick-action" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="ページトップへ">
+                ⬆️
+            </button>
+            <button class="quick-action" onclick="window.print()" title="印刷">
+                🖨️
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Smooth scroll
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Update active nav link on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let currentSection = '';
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                if (sectionTop <= 100 && sectionTop >= -section.offsetHeight + 100) {
+                    currentSection = section.id;
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Analytics tracking (if needed)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📖 User Manual loaded successfully');
+            
+            // Track section views
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        console.log(`📊 Viewed section: ${entry.target.id}`);
+                    }
+                });
+            }, {
+                threshold: 0.5
+            });
+            
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>

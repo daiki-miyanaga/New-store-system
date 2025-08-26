@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>実績入力＆日次ノート | 在庫管理システム - MOC Architecture</title>
+    
+    <!-- MOC Base Styles -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    
+    <style>
+    /* Performance Input専用スタイル */
+    .performance-layout {
+        min-height: 100vh;
+        background-color: var(--bg-secondary);
+    }
+
+    .performance-main {
+        flex: 1;
+        padding-top: 0;
+    }
+
+    .performance-content {
+        padding-bottom: var(--spacing-3xl);
+    }
+
+    .performance-info,
+    .performance-summary,
+    .performance-data,
+    .hourly-sales,
+    .performance-actions {
+        padding: var(--spacing-xl) 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .performance-actions {
+        border-bottom: none;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-item label {
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-xs);
+        font-size: var(--font-size-sm);
+    }
+
+    .form-input {
+        padding: var(--spacing-sm);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        font-size: var(--font-size-base);
+        transition: border-color var(--transition-fast);
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .summary-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .performance-table,
+    .hourly-sales-table {
+        width: 100%;
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .actions-bar {
+        display: flex;
+        gap: var(--spacing-md);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border: none;
+        border-radius: var(--border-radius-lg);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: var(--color-secondary);
+        color: var(--color-white);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-secondary-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: var(--color-gray-100);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-gray-200);
+        transform: translateY(-2px);
+    }
+
+    .btn-warning {
+        background-color: var(--color-warning);
+        color: var(--color-white);
+    }
+
+    .btn-warning:hover {
+        background-color: var(--color-warning-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    /* データダーティ状態の表示 */
+    body.data-dirty .performance-info::before {
+        content: '● 未保存のデータがあります';
+        position: fixed;
+        top: 80px;
+        right: var(--spacing-lg);
+        background: var(--color-warning);
+        color: var(--color-white);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--border-radius-full);
+        font-size: var(--font-size-sm);
+        z-index: var(--z-modal);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .summary-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .actions-bar {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 280px;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .summary-cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .performance-info,
+        .performance-summary,
+        .performance-data,
+        .hourly-sales,
+        .performance-actions {
+            padding: var(--spacing-md) 0;
+        }
+    }
+    </style>
+</head>
+<body>
+    <!-- Performance Input will be mounted here -->
+    <div id="performance-root"></div>
+    
+    <!-- Loading indicator -->
+    <div id="performance-loading" class="dashboard-loading" style="display: none;">
+        <div class="dashboard-loading-spinner"></div>
+        <div class="dashboard-loading-text">実績入力システムを読み込み中...</div>
+    </div>
+    
+    <!-- Error state -->
+    <div id="performance-error" class="dashboard-error" style="display: none;">
+        <div class="dashboard-error-icon">⚠️</div>
+        <div class="dashboard-error-message">実績入力システムの読み込みに失敗しました</div>
+        <button class="dashboard-retry-btn" onclick="initializePerformanceInput()">再試行</button>
+    </div>
+    
+    <!-- Auto-save indicator -->
+    <div id="autosave-indicator" class="dashboard-refresh-indicator">
+        💾 データを自動保存中...
+    </div>
+    
+    <!-- MOC Core Components -->
+    <script src="src/utils/EventBus.js"></script>
+    <script src="src/stores/AppStore.js"></script>
+    <script src="src/services/InventoryService.js"></script>
+    
+    <!-- MOC UI Components -->
+    <script src="src/components/ui/Card.js"></script>
+    <script src="src/components/ui/Table.js"></script>
+    <script src="src/components/ui/Chart.js"></script>
+    <script src="src/components/ui/Alert.js"></script>
+    <script src="src/components/ui/Form.js"></script>
+    
+    <!-- MOC Layout Components -->
+    <script src="src/components/layout/Header.js"></script>
+    
+    <!-- MOC Performance Input Page -->
+    <script src="src/pages/performance/PerformanceInput.js"></script>
+    
+    <script>
+        // Global application state
+        let performanceInput = null;
+        let isLoading = false;
+        
+        /**
+         * 実績入力システムの初期化
+         */
+        async function initializePerformanceInput() {
+            if (isLoading) return;
+            
+            try {
+                isLoading = true;
+                showLoading();
+                
+                // PerformanceInput instance creation
+                performanceInput = new PerformanceInput({
+                    container: '#performance-root',
+                    autoSave: true,
+                    saveInterval: 30000 // 30秒
+                });
+                
+                // Initialize performance input system
+                await performanceInput.init();
+                
+                hideLoading();
+                
+                // Setup global event listeners
+                setupGlobalEventListeners();
+                
+                // Debug information
+                console.log('🚀 MOC Performance Input initialized successfully');
+                console.log('📊 Components loaded:', {
+                    EventBus: !!window.eventBus,
+                    AppStore: !!window.appStore,
+                    Card: !!window.Card,
+                    Table: !!window.Table,
+                    Chart: !!window.MOCChart,
+                    Alert: !!window.Alert,
+                    Form: !!window.Form,
+                    Header: !!window.Header,
+                    PerformanceInput: !!window.PerformanceInput
+                });
+                
+            } catch (error) {
+                console.error('Performance Input initialization failed:', error);
+                showError();
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        /**
+         * ローディング表示
+         */
+        function showLoading() {
+            document.getElementById('performance-loading').style.display = 'flex';
+            document.getElementById('performance-error').style.display = 'none';
+            document.getElementById('performance-root').style.display = 'none';
+        }
+        
+        /**
+         * ローディング非表示
+         */
+        function hideLoading() {
+            document.getElementById('performance-loading').style.display = 'none';
+            document.getElementById('performance-root').style.display = 'block';
+        }
+        
+        /**
+         * エラー表示
+         */
+        function showError() {
+            document.getElementById('performance-loading').style.display = 'none';
+            document.getElementById('performance-error').style.display = 'flex';
+            document.getElementById('performance-root').style.display = 'none';
+        }
+        
+        /**
+         * 自動保存インジケーター表示
+         */
+        function showAutoSaveIndicator() {
+            const indicator = document.getElementById('autosave-indicator');
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+        
+        /**
+         * グローバルイベントリスナーの設定
+         */
+        function setupGlobalEventListeners() {
+            // Performance events
+            if (window.eventBus) {
+                window.eventBus.on('performance.saved', () => {
+                    console.log('📊 Performance data saved successfully');
+                    showAutoSaveIndicator();
+                });
+                
+                window.eventBus.on('performance.rowUpdated', (data) => {
+                    console.log('📝 Performance row updated:', data.column, data.value);
+                });
+                
+                window.eventBus.on('performance.syncToOrder', (data) => {
+                    console.log('🔄 Data synced to order system:', data);
+                    Alert.success('発注システムにデータを送信しました').mount();
+                });
+                
+                window.eventBus.on('performance.hourlySalesUpdated', (data) => {
+                    console.log('⏰ Hourly sales updated:', data.column, data.value);
+                });
+            }
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + S for manual save
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    if (performanceInput) {
+                        performanceInput.saveData();
+                    }
+                }
+                
+                // Ctrl/Cmd + R for reset (with confirmation)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (performanceInput) {
+                        performanceInput.resetData();
+                    }
+                }
+                
+                // F5 for full reload
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    location.reload();
+                }
+            });
+            
+            // Performance monitoring
+            if (window.performance && window.performance.mark) {
+                window.performance.mark('performance-input-ready');
+            }
+            
+            // Page visibility change handling
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && performanceInput) {
+                    // Page became visible, check if auto-save is needed
+                    if (document.body.classList.contains('data-dirty')) {
+                        console.log('👀 Page visible with dirty data, considering save...');
+                    }
+                }
+            });
+            
+            // Before unload warning for unsaved changes
+            window.addEventListener('beforeunload', (e) => {
+                if (document.body.classList.contains('data-dirty')) {
+                    e.preventDefault();
+                    e.returnValue = '未保存のデータがあります。ページを離れますか？';
+                    return e.returnValue;
+                }
+            });
+        }
+        
+        /**
+         * ページ読み込み完了後の初期化
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Performance timing
+            const startTime = performance.now();
+            
+            // Initialize application
+            initializePerformanceInput().then(() => {
+                const endTime = performance.now();
+                console.log(`⚡ Performance Input loaded in ${(endTime - startTime).toFixed(2)}ms`);
+                
+                // Welcome message for development
+                if (window.location.search.includes('debug=true')) {
+                    Alert.success('🎉 MOC Performance Input loaded successfully!', {
+                        autoClose: 3000
+                    }).mount();
+                }
+            });
+        });
+        
+        /**
+         * Error handling
+         */
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            
+            if (window.Alert) {
+                Alert.error('予期しないエラーが発生しました。データを保存してページを再読み込みしてください。').mount();
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            e.preventDefault();
+        });
+        
+        // Export for debugging
+        if (window.location.search.includes('debug=true')) {
+            window.performanceInput = null; // Will be set after initialization
+            window.mocPerformanceDebug = {
+                saveData: () => performanceInput?.saveData(),
+                resetData: () => performanceInput?.resetData(),
+                exportCSV: () => performanceInput?.exportToCSV(),
+                getAllData: () => performanceInput?.getAllData(),
+                getValidationErrors: () => performanceInput?.validationErrors,
+                markDirty: () => performanceInput?.markDirty(),
+                clearDirty: () => performanceInput?.clearDirty(),
+                showTestAlert: () => Alert.success('Test alert from Performance Input').mount(),
+                getStats: () => ({
+                    eventBusStats: window.eventBus?.getStats(),
+                    appStoreDebug: window.appStore?.getDebugInfo(),
+                    isDirty: document.body.classList.contains('data-dirty'),
+                    autoSaveEnabled: performanceInput?.autoSave
+                })
+            };
+            
+            console.log('🔧 Debug mode enabled. Use window.mocPerformanceDebug for debugging.');
+        }
+    </script>
+    
+    <!-- Service Worker registration for offline support (optional) -->
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            navigator.serviceWorker.register('/sw.js').then((registration) => {
+                console.log('SW registered: ', registration);
+            }).catch((registrationError) => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        }
+    </script>
+</body>
+</html>

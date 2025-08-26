@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>過去データ分析 | 在庫管理システム - MOC Architecture</title>
+    
+    <!-- MOC Base Styles -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    
+    <style>
+    /* Historical Analysis専用スタイル */
+    .historical-analysis-layout {
+        min-height: 100vh;
+        background-color: var(--bg-secondary);
+    }
+
+    .analysis-main {
+        flex: 1;
+        padding-top: 0;
+    }
+
+    .analysis-content {
+        padding-bottom: var(--spacing-3xl);
+    }
+
+    .analysis-search,
+    .analysis-summary,
+    .analysis-data,
+    .analysis-charts,
+    .analysis-forecast {
+        padding: var(--spacing-xl) 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .analysis-forecast {
+        border-bottom: none;
+    }
+
+    /* Search Form */
+    .search-form-container {
+        background: var(--bg-primary);
+        padding: var(--spacing-xl);
+        border-radius: var(--border-radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+    }
+
+    .form-input {
+        padding: var(--spacing-sm);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        font-size: var(--font-size-base);
+        transition: border-color var(--transition-fast);
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    /* Summary Cards */
+    .summary-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    /* Data Controls */
+    .data-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
+    }
+
+    .control-group {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .control-group label {
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+
+    /* Analysis Table */
+    .analysis-table {
+        width: 100%;
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+    }
+
+    .analysis-table th,
+    .analysis-table td {
+        padding: var(--spacing-sm);
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .analysis-table th {
+        background-color: var(--color-gray-100);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .analysis-table tbody tr:hover {
+        background-color: var(--color-secondary-light);
+        cursor: pointer;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: var(--spacing-xl);
+    }
+
+    .chart-container {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-xl);
+        padding: var(--spacing-xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        transition: all var(--transition-base);
+        min-height: 350px;
+    }
+
+    .chart-container:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .chart-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-lg);
+        text-align: center;
+        position: relative;
+    }
+
+    .chart-title::after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 2px;
+        background: var(--color-info);
+        margin: var(--spacing-sm) auto 0;
+        border-radius: var(--border-radius-full);
+    }
+
+    /* Forecast Panel */
+    .forecast-panel {
+        background: var(--bg-primary);
+        padding: var(--spacing-xl);
+        border-radius: var(--border-radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+    }
+
+    .forecast-controls {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .forecast-results {
+        min-height: 200px;
+        background: var(--color-gray-25);
+        border-radius: var(--border-radius-md);
+        padding: var(--spacing-lg);
+        border: 1px solid var(--border-color);
+    }
+
+    .forecast-summary h4 {
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-md);
+        text-align: center;
+    }
+
+    .forecast-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-color);
+    }
+
+    .metric-label {
+        color: var(--text-secondary);
+        font-size: var(--font-size-sm);
+    }
+
+    .forecast-chart-placeholder {
+        height: 200px;
+        background: var(--color-gray-100);
+        border-radius: var(--border-radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: var(--font-size-lg);
+        border: 2px dashed var(--border-color);
+    }
+
+    /* Buttons */
+    .btn {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border: none;
+        border-radius: var(--border-radius-lg);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: var(--color-secondary);
+        color: var(--color-white);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-secondary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+        background-color: var(--color-gray-100);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-gray-200);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 1200px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .summary-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .data-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .control-group {
+            justify-content: space-between;
+        }
+
+        .forecast-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .forecast-metrics {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-container {
+            min-height: 250px;
+            padding: var(--spacing-md);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .summary-cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .analysis-search,
+        .analysis-summary,
+        .analysis-data,
+        .analysis-charts,
+        .analysis-forecast {
+            padding: var(--spacing-md) 0;
+        }
+
+        .search-form-container,
+        .forecast-panel {
+            padding: var(--spacing-lg);
+        }
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .analysis-search,
+    .analysis-summary,
+    .analysis-data,
+    .analysis-charts,
+    .analysis-forecast {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .analysis-search { animation-delay: 0.1s; }
+    .analysis-summary { animation-delay: 0.2s; }
+    .analysis-data { animation-delay: 0.3s; }
+    .analysis-charts { animation-delay: 0.4s; }
+    .analysis-forecast { animation-delay: 0.5s; }
+
+    /* Print Support */
+    @media print {
+        .historical-analysis-layout {
+            background: white;
+        }
+
+        .analysis-search,
+        .forecast-controls,
+        .btn {
+            display: none;
+        }
+
+        .chart-container {
+            break-inside: avoid;
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+
+        .charts-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+    }
+
+    /* High Contrast Support */
+    @media (prefers-contrast: high) {
+        .chart-container,
+        .search-form-container,
+        .forecast-panel {
+            border-width: 2px;
+            border-color: var(--text-primary);
+        }
+    }
+
+    /* Reduced Motion Support */
+    @media (prefers-reduced-motion: reduce) {
+        .chart-container,
+        .btn,
+        .analysis-search,
+        .analysis-summary,
+        .analysis-data,
+        .analysis-charts,
+        .analysis-forecast {
+            animation: none;
+            transition: none;
+        }
+
+        .chart-container:hover,
+        .btn:hover {
+            transform: none;
+        }
+    }
+    </style>
+</head>
+<body>
+    <!-- Historical Analysis will be mounted here -->
+    <div id="analysis-root"></div>
+    
+    <!-- Loading indicator -->
+    <div id="analysis-loading" class="dashboard-loading" style="display: none;">
+        <div class="dashboard-loading-spinner"></div>
+        <div class="dashboard-loading-text">過去データ分析を読み込み中...</div>
+    </div>
+    
+    <!-- Error state -->
+    <div id="analysis-error" class="dashboard-error" style="display: none;">
+        <div class="dashboard-error-icon">⚠️</div>
+        <div class="dashboard-error-message">過去データ分析の読み込みに失敗しました</div>
+        <button class="dashboard-retry-btn" onclick="initializeHistoricalAnalysis()">再試行</button>
+    </div>
+    
+    <!-- Search indicator -->
+    <div id="search-indicator" class="dashboard-refresh-indicator">
+        🔍 データを検索中...
+    </div>
+    
+    <!-- MOC Core Components -->
+    <script src="src/utils/EventBus.js"></script>
+    <script src="src/stores/AppStore.js"></script>
+    <script src="src/services/InventoryService.js"></script>
+    
+    <!-- MOC UI Components -->
+    <script src="src/components/ui/Card.js"></script>
+    <script src="src/components/ui/Table.js"></script>
+    <script src="src/components/ui/Chart.js"></script>
+    <script src="src/components/ui/Alert.js"></script>
+    <script src="src/components/ui/Form.js"></script>
+    
+    <!-- MOC Layout Components -->
+    <script src="src/components/layout/Header.js"></script>
+    
+    <!-- MOC Historical Analysis Page -->
+    <script src="src/pages/analysis/HistoricalAnalysis.js"></script>
+    
+    <script>
+        // Global application state
+        let historicalAnalysis = null;
+        let isLoading = false;
+        
+        /**
+         * 過去データ分析システムの初期化
+         */
+        async function initializeHistoricalAnalysis() {
+            if (isLoading) return;
+            
+            try {
+                isLoading = true;
+                showLoading();
+                
+                // HistoricalAnalysis instance creation
+                historicalAnalysis = new HistoricalAnalysis({
+                    container: '#analysis-root',
+                    defaultDateRange: 30,
+                    maxDateRange: 365
+                });
+                
+                // Initialize historical analysis system
+                await historicalAnalysis.init();
+                
+                hideLoading();
+                
+                // Setup global event listeners
+                setupGlobalEventListeners();
+                
+                // Debug information
+                console.log('🚀 MOC Historical Analysis initialized successfully');
+                console.log('📊 Components loaded:', {
+                    EventBus: !!window.eventBus,
+                    AppStore: !!window.appStore,
+                    Card: !!window.Card,
+                    Table: !!window.Table,
+                    Chart: !!window.MOCChart,
+                    Alert: !!window.Alert,
+                    Form: !!window.Form,
+                    Header: !!window.Header,
+                    HistoricalAnalysis: !!window.HistoricalAnalysis
+                });
+                
+            } catch (error) {
+                console.error('Historical Analysis initialization failed:', error);
+                showError();
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        /**
+         * ローディング表示
+         */
+        function showLoading() {
+            document.getElementById('analysis-loading').style.display = 'flex';
+            document.getElementById('analysis-error').style.display = 'none';
+            document.getElementById('analysis-root').style.display = 'none';
+        }
+        
+        /**
+         * ローディング非表示
+         */
+        function hideLoading() {
+            document.getElementById('analysis-loading').style.display = 'none';
+            document.getElementById('analysis-root').style.display = 'block';
+        }
+        
+        /**
+         * エラー表示
+         */
+        function showError() {
+            document.getElementById('analysis-loading').style.display = 'none';
+            document.getElementById('analysis-error').style.display = 'flex';
+            document.getElementById('analysis-root').style.display = 'none';
+        }
+        
+        /**
+         * 検索インジケーター表示
+         */
+        function showSearchIndicator() {
+            const indicator = document.getElementById('search-indicator');
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 3000);
+        }
+        
+        /**
+         * グローバルイベントリスナーの設定
+         */
+        function setupGlobalEventListeners() {
+            // Historical Analysis events
+            if (window.eventBus) {
+                window.eventBus.on('historicalAnalysis.loaded', () => {
+                    console.log('📈 Historical Analysis loaded successfully');
+                });
+                
+                window.eventBus.on('analysis.searchStarted', () => {
+                    console.log('🔍 Analysis search started');
+                    showSearchIndicator();
+                });
+                
+                window.eventBus.on('analysis.searchCompleted', (data) => {
+                    console.log('✅ Analysis search completed:', data);
+                });
+                
+                window.eventBus.on('analysis.forecastGenerated', (forecast) => {
+                    console.log('🔮 Forecast generated:', forecast);
+                });
+            }
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + Enter for search
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    const searchBtn = document.querySelector('[data-action="search"]');
+                    if (searchBtn) {
+                        searchBtn.click();
+                    }
+                }
+                
+                // Ctrl/Cmd + E for export
+                if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                    e.preventDefault();
+                    if (historicalAnalysis) {
+                        historicalAnalysis.exportToCSV();
+                    }
+                }
+                
+                // Ctrl/Cmd + R for report generation
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (historicalAnalysis) {
+                        historicalAnalysis.generateReport();
+                    }
+                }
+                
+                // F5 for full reload
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    location.reload();
+                }
+            });
+            
+            // Performance monitoring
+            if (window.performance && window.performance.mark) {
+                window.performance.mark('historical-analysis-ready');
+            }
+            
+            // Page visibility change handling
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && historicalAnalysis) {
+                    console.log('👀 Historical analysis page became visible');
+                }
+            });
+        }
+        
+        /**
+         * ページ読み込み完了後の初期化
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Performance timing
+            const startTime = performance.now();
+            
+            // Initialize application
+            initializeHistoricalAnalysis().then(() => {
+                const endTime = performance.now();
+                console.log(`⚡ Historical Analysis loaded in ${(endTime - startTime).toFixed(2)}ms`);
+                
+                // Welcome message for development
+                if (window.location.search.includes('debug=true')) {
+                    Alert.success('🎉 MOC Historical Analysis loaded successfully!', {
+                        autoClose: 3000
+                    }).mount();
+                }
+            });
+        });
+        
+        /**
+         * Error handling
+         */
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            
+            if (window.Alert) {
+                Alert.error('予期しないエラーが発生しました。ページを再読み込みしてください。').mount();
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            e.preventDefault();
+        });
+        
+        // Export for debugging
+        if (window.location.search.includes('debug=true')) {
+            window.historicalAnalysis = null; // Will be set after initialization
+            window.mocAnalysisDebug = {
+                performSearch: () => historicalAnalysis?.performSearch(),
+                exportToCSV: () => historicalAnalysis?.exportToCSV(),
+                generateReport: () => historicalAnalysis?.generateReport(),
+                generateForecast: () => historicalAnalysis?.generateForecast(),
+                changeViewMode: (mode) => historicalAnalysis?.changeViewMode(mode),
+                getHistoricalData: () => historicalAnalysis?.historicalData,
+                getFilteredData: () => historicalAnalysis?.filteredData,
+                getAnalysisSummary: () => historicalAnalysis?.analysisSummary,
+                getSearchCriteria: () => historicalAnalysis?.searchCriteria,
+                showTestAlert: () => Alert.success('Test alert from Historical Analysis').mount(),
+                getStats: () => ({
+                    eventBusStats: window.eventBus?.getStats(),
+                    appStoreDebug: window.appStore?.getDebugInfo(),
+                    totalDataPoints: historicalAnalysis?.filteredData?.length || 0,
+                    chartCount: historicalAnalysis?.analysisCharts?.length || 0,
+                    dateRange: `${historicalAnalysis?.searchCriteria?.startDate} - ${historicalAnalysis?.searchCriteria?.endDate}`
+                })
+            };
+            
+            console.log('🔧 Debug mode enabled. Use window.mocAnalysisDebug for debugging.');
+        }
+    </script>
+    
+    <!-- Service Worker registration for offline support (optional) -->
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            navigator.serviceWorker.register('/sw.js').then((registration) => {
+                console.log('SW registered: ', registration);
+            }).catch((registrationError) => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マスタメンテナンス | 在庫管理システム - MOC Architecture</title>
+    
+    <!-- MOC Base Styles -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    
+    <style>
+    /* Master Maintenance専用スタイル */
+    .master-maintenance-layout {
+        min-height: 100vh;
+        background-color: var(--bg-secondary);
+    }
+
+    .master-main {
+        flex: 1;
+        padding-top: 0;
+    }
+
+    .master-content {
+        padding-bottom: var(--spacing-3xl);
+    }
+
+    .master-tabs,
+    .master-tab-content {
+        padding: var(--spacing-xl) 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .master-tab-content {
+        border-bottom: none;
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+        display: flex;
+        gap: var(--spacing-xs);
+        background: var(--bg-primary);
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+    }
+
+    .tab-button {
+        flex: 0 0 auto;
+        padding: var(--spacing-md) var(--spacing-lg);
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        border-radius: var(--border-radius-md);
+        transition: all var(--transition-base);
+        white-space: nowrap;
+    }
+
+    .tab-button:hover {
+        background: var(--color-secondary-light);
+        color: var(--color-secondary-dark);
+    }
+
+    .tab-button.active {
+        background: var(--color-secondary);
+        color: var(--color-white);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Tab Content */
+    .tab-content {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+    }
+
+    .tab-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-xl);
+        padding-bottom: var(--spacing-lg);
+        border-bottom: 2px solid var(--color-gray-100);
+    }
+
+    .tab-title {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .tab-actions {
+        display: flex;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+    }
+
+    /* Master Table */
+    .master-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+    }
+
+    .master-table th,
+    .master-table td {
+        padding: var(--spacing-sm);
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+        font-size: var(--font-size-sm);
+    }
+
+    .master-table th {
+        background-color: var(--color-gray-100);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .master-table tbody tr:hover {
+        background-color: var(--color-secondary-light);
+    }
+
+    .master-table .actions-cell {
+        display: flex;
+        gap: var(--spacing-xs);
+    }
+
+    .action-btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border: none;
+        border-radius: var(--border-radius-sm);
+        font-size: var(--font-size-xs);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .action-btn.edit {
+        background: var(--color-info);
+        color: var(--color-white);
+    }
+
+    .action-btn.delete {
+        background: var(--color-error);
+        color: var(--color-white);
+    }
+
+    .action-btn.copy {
+        background: var(--color-success);
+        color: var(--color-white);
+    }
+
+    .action-btn:hover {
+        opacity: 0.8;
+        transform: translateY(-1px);
+    }
+
+    /* Buttons */
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: none;
+        border-radius: var(--border-radius-lg);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: var(--color-secondary);
+        color: var(--color-white);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-secondary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+        background-color: var(--color-gray-100);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-gray-200);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-warning {
+        background-color: var(--color-warning);
+        color: var(--color-white);
+    }
+
+    .btn-warning:hover {
+        background-color: var(--color-warning-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: var(--z-modal);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-dialog {
+        position: relative;
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-xl);
+        box-shadow: var(--shadow-2xl);
+        border: 1px solid var(--border-color);
+        min-width: 500px;
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-lg);
+        border-bottom: 1px solid var(--border-color);
+        background: var(--color-gray-25);
+    }
+
+    .modal-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: var(--font-size-lg);
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: var(--spacing-xs);
+        border-radius: var(--border-radius-sm);
+        transition: all var(--transition-fast);
+    }
+
+    .modal-close:hover {
+        background: var(--color-error-light);
+        color: var(--color-error-dark);
+    }
+
+    .modal-body {
+        flex: 1;
+        padding: var(--spacing-lg);
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--spacing-md);
+        padding: var(--spacing-lg);
+        border-top: 1px solid var(--border-color);
+        background: var(--color-gray-25);
+    }
+
+    /* Form in Settings Tab */
+    .settings-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-xs);
+        font-size: var(--font-size-sm);
+    }
+
+    .form-input,
+    .form-select {
+        padding: var(--spacing-sm);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        font-size: var(--font-size-base);
+        transition: border-color var(--transition-fast);
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .form-checkbox {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-sm);
+    }
+
+    .form-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--border-radius-full);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+    }
+
+    .status-badge.active {
+        background: var(--color-success-light);
+        color: var(--color-success-dark);
+    }
+
+    .status-badge.inactive {
+        background: var(--color-gray-100);
+        color: var(--color-gray-600);
+    }
+
+    .status-badge.discontinued {
+        background: var(--color-error-light);
+        color: var(--color-error-dark);
+    }
+
+    .status-badge.suspended {
+        background: var(--color-warning-light);
+        color: var(--color-warning-dark);
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .tab-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: var(--spacing-md);
+        }
+
+        .tab-actions {
+            justify-content: center;
+        }
+
+        .tab-navigation {
+            justify-content: flex-start;
+        }
+
+        .tab-button {
+            font-size: var(--font-size-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+        }
+
+        .master-table {
+            font-size: var(--font-size-xs);
+        }
+
+        .master-table th,
+        .master-table td {
+            padding: var(--spacing-xs);
+        }
+
+        .settings-form {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-dialog {
+            min-width: auto;
+            width: 95vw;
+            margin: var(--spacing-md);
+        }
+
+        .modal-footer {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .master-tabs,
+        .master-tab-content {
+            padding: var(--spacing-md) 0;
+        }
+
+        .tab-content {
+            padding: var(--spacing-md);
+        }
+
+        .tab-title {
+            font-size: var(--font-size-lg);
+        }
+
+        .action-btn {
+            padding: var(--spacing-xs);
+            font-size: 10px;
+        }
+    }
+
+    /* Animation */
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .master-tabs,
+    .master-tab-content {
+        animation: slideInDown 0.6s ease-out;
+    }
+
+    .master-tabs { animation-delay: 0.1s; }
+    .master-tab-content { animation-delay: 0.2s; }
+
+    /* Print Support */
+    @media print {
+        .master-maintenance-layout {
+            background: white;
+        }
+
+        .tab-actions,
+        .action-btn,
+        .modal,
+        .btn {
+            display: none;
+        }
+
+        .master-table {
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+
+        .tab-content {
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+    }
+
+    /* High Contrast Support */
+    @media (prefers-contrast: high) {
+        .master-table,
+        .tab-content,
+        .modal-dialog {
+            border-width: 2px;
+            border-color: var(--text-primary);
+        }
+
+        .status-badge {
+            border: 1px solid currentColor;
+        }
+    }
+
+    /* Reduced Motion Support */
+    @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .tab-button,
+        .action-btn,
+        .master-tabs,
+        .master-tab-content {
+            animation: none;
+            transition: none;
+        }
+
+        .btn:hover,
+        .tab-button:hover,
+        .action-btn:hover {
+            transform: none;
+        }
+    }
+    </style>
+</head>
+<body>
+    <!-- Master Maintenance will be mounted here -->
+    <div id="master-root"></div>
+    
+    <!-- Loading indicator -->
+    <div id="master-loading" class="dashboard-loading" style="display: none;">
+        <div class="dashboard-loading-spinner"></div>
+        <div class="dashboard-loading-text">マスタメンテナンスを読み込み中...</div>
+    </div>
+    
+    <!-- Error state -->
+    <div id="master-error" class="dashboard-error" style="display: none;">
+        <div class="dashboard-error-icon">⚠️</div>
+        <div class="dashboard-error-message">マスタメンテナンスの読み込みに失敗しました</div>
+        <button class="dashboard-retry-btn" onclick="initializeMasterMaintenance()">再試行</button>
+    </div>
+    
+    <!-- MOC Core Components -->
+    <script src="src/utils/EventBus.js"></script>
+    <script src="src/stores/AppStore.js"></script>
+    <script src="src/services/InventoryService.js"></script>
+    
+    <!-- MOC UI Components -->
+    <script src="src/components/ui/Card.js"></script>
+    <script src="src/components/ui/Table.js"></script>
+    <script src="src/components/ui/Alert.js"></script>
+    <script src="src/components/ui/Form.js"></script>
+    
+    <!-- MOC Layout Components -->
+    <script src="src/components/layout/Header.js"></script>
+    
+    <!-- MOC Master Maintenance Page -->
+    <script src="src/pages/admin/MasterMaintenance.js"></script>
+    
+    <script>
+        // Global application state
+        let masterMaintenance = null;
+        let isLoading = false;
+        
+        /**
+         * マスタメンテナンスシステムの初期化
+         */
+        async function initializeMasterMaintenance() {
+            if (isLoading) return;
+            
+            try {
+                isLoading = true;
+                showLoading();
+                
+                // MasterMaintenance instance creation
+                masterMaintenance = new MasterMaintenance({
+                    container: '#master-root'
+                });
+                
+                // Initialize master maintenance system
+                await masterMaintenance.init();
+                
+                hideLoading();
+                
+                // Setup global event listeners
+                setupGlobalEventListeners();
+                
+                // Debug information
+                console.log('🚀 MOC Master Maintenance initialized successfully');
+                console.log('📊 Components loaded:', {
+                    EventBus: !!window.eventBus,
+                    AppStore: !!window.appStore,
+                    Card: !!window.Card,
+                    Table: !!window.Table,
+                    Alert: !!window.Alert,
+                    Form: !!window.Form,
+                    Header: !!window.Header,
+                    MasterMaintenance: !!window.MasterMaintenance
+                });
+                
+            } catch (error) {
+                console.error('Master Maintenance initialization failed:', error);
+                showError();
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        /**
+         * ローディング表示
+         */
+        function showLoading() {
+            document.getElementById('master-loading').style.display = 'flex';
+            document.getElementById('master-error').style.display = 'none';
+            document.getElementById('master-root').style.display = 'none';
+        }
+        
+        /**
+         * ローディング非表示
+         */
+        function hideLoading() {
+            document.getElementById('master-loading').style.display = 'none';
+            document.getElementById('master-root').style.display = 'block';
+        }
+        
+        /**
+         * エラー表示
+         */
+        function showError() {
+            document.getElementById('master-loading').style.display = 'none';
+            document.getElementById('master-error').style.display = 'flex';
+            document.getElementById('master-root').style.display = 'none';
+        }
+        
+        /**
+         * グローバルイベントリスナーの設定
+         */
+        function setupGlobalEventListeners() {
+            // Master Maintenance events
+            if (window.eventBus) {
+                window.eventBus.on('masterMaintenance.loaded', () => {
+                    console.log('🔧 Master Maintenance loaded successfully');
+                });
+                
+                window.eventBus.on('master.dataUpdated', (data) => {
+                    console.log('📝 Master data updated:', data);
+                });
+                
+                window.eventBus.on('master.importCompleted', (result) => {
+                    console.log('📤 Import completed:', result);
+                });
+                
+                window.eventBus.on('master.exportCompleted', (result) => {
+                    console.log('📥 Export completed:', result);
+                });
+            }
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // ESC for close modal
+                if (e.key === 'Escape') {
+                    if (masterMaintenance && masterMaintenance.currentForm) {
+                        masterMaintenance.closeModal();
+                    }
+                }
+                
+                // Ctrl/Cmd + S for save (when modal is open)
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    if (masterMaintenance && masterMaintenance.currentForm) {
+                        masterMaintenance.saveModalData();
+                    }
+                }
+                
+                // Ctrl/Cmd + N for new item
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                    e.preventDefault();
+                    if (masterMaintenance) {
+                        const activeTab = masterMaintenance.activeTab;
+                        switch (activeTab) {
+                            case 'products':
+                                masterMaintenance.showProductModal();
+                                break;
+                            case 'categories':
+                                masterMaintenance.showCategoryModal();
+                                break;
+                            case 'suppliers':
+                                masterMaintenance.showSupplierModal();
+                                break;
+                            case 'users':
+                                masterMaintenance.showUserModal();
+                                break;
+                        }
+                    }
+                }
+                
+                // Tab navigation (Ctrl + 1-5)
+                if ((e.ctrlKey || e.metaKey) && e.key >= '1' && e.key <= '5') {
+                    e.preventDefault();
+                    const tabs = ['products', 'categories', 'suppliers', 'settings', 'users'];
+                    const tabIndex = parseInt(e.key) - 1;
+                    if (masterMaintenance && tabs[tabIndex]) {
+                        masterMaintenance.showTab(tabs[tabIndex]);
+                    }
+                }
+                
+                // F5 for full reload
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    location.reload();
+                }
+            });
+            
+            // Performance monitoring
+            if (window.performance && window.performance.mark) {
+                window.performance.mark('master-maintenance-ready');
+            }
+            
+            // Page visibility change handling
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && masterMaintenance) {
+                    console.log('👀 Master maintenance page became visible');
+                }
+            });
+        }
+        
+        /**
+         * ページ読み込み完了後の初期化
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Performance timing
+            const startTime = performance.now();
+            
+            // Initialize application
+            initializeMasterMaintenance().then(() => {
+                const endTime = performance.now();
+                console.log(`⚡ Master Maintenance loaded in ${(endTime - startTime).toFixed(2)}ms`);
+                
+                // Welcome message for development
+                if (window.location.search.includes('debug=true')) {
+                    Alert.success('🎉 MOC Master Maintenance loaded successfully!', {
+                        autoClose: 3000
+                    }).mount();
+                }
+            });
+        });
+        
+        /**
+         * Error handling
+         */
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            
+            if (window.Alert) {
+                Alert.error('予期しないエラーが発生しました。ページを再読み込みしてください。').mount();
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            e.preventDefault();
+        });
+        
+        // Export for debugging
+        if (window.location.search.includes('debug=true')) {
+            window.masterMaintenance = null; // Will be set after initialization
+            window.mocMasterDebug = {
+                showTab: (tab) => masterMaintenance?.showTab(tab),
+                showModal: (type) => {
+                    const methods = {
+                        product: () => masterMaintenance?.showProductModal(),
+                        category: () => masterMaintenance?.showCategoryModal(),
+                        supplier: () => masterMaintenance?.showSupplierModal(),
+                        user: () => masterMaintenance?.showUserModal()
+                    };
+                    if (methods[type]) methods[type]();
+                },
+                exportData: (type) => {
+                    if (type === 'products' && masterMaintenance) {
+                        masterMaintenance.exportProducts();
+                    }
+                },
+                getMasterData: () => masterMaintenance?.masterData,
+                getTables: () => masterMaintenance?.tables,
+                getForms: () => masterMaintenance?.forms,
+                showTestAlert: () => Alert.success('Test alert from Master Maintenance').mount(),
+                getStats: () => ({
+                    eventBusStats: window.eventBus?.getStats(),
+                    appStoreDebug: window.appStore?.getDebugInfo(),
+                    activeTab: masterMaintenance?.activeTab,
+                    tablesLoaded: Object.keys(masterMaintenance?.tables || {}),
+                    formsLoaded: Object.keys(masterMaintenance?.forms || {})
+                })
+            };
+            
+            console.log('🔧 Debug mode enabled. Use window.mocMasterDebug for debugging.');
+            console.log('🎯 Keyboard shortcuts:');
+            console.log('  - Ctrl+1-5: Tab navigation');
+            console.log('  - Ctrl+N: New item');
+            console.log('  - Ctrl+S: Save (when modal open)');
+            console.log('  - ESC: Close modal');
+        }
+    </script>
+    
+    <!-- Service Worker registration for offline support (optional) -->
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            navigator.serviceWorker.register('/sw.js').then((registration) => {
+                console.log('SW registered: ', registration);
+            }).catch((registrationError) => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "name": "inventory-management-moc",
+  "version": "1.0.0",
+  "description": "在庫管理システム - MOC Architecture",
+  "main": "index-moc.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "serve": "npx serve .",
+    "dev": "python3 -m http.server 8000",
+    "build": "echo 'Static files - no build required'",
+    "lint": "echo 'Linting not configured'",
+    "test": "echo 'Testing not configured'"
+  },
+  "keywords": [
+    "inventory-management",
+    "moc-architecture",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "author": "Claude Code Assistant",
+  "license": "PROPRIETARY",
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {}
+}

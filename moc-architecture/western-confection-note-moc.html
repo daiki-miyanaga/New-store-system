@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洋生ノート | 在庫管理システム - MOC Architecture</title>
+    
+    <!-- MOC Base Styles -->
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧁</text></svg>">
+    
+    <style>
+    /* Western Confection Note専用スタイル */
+    .western-confection-layout {
+        min-height: 100vh;
+        background-color: var(--bg-secondary);
+    }
+
+    .western-main {
+        flex: 1;
+        padding-top: 0;
+    }
+
+    .western-content {
+        padding-bottom: var(--spacing-3xl);
+    }
+
+    .confection-info,
+    .confection-summary,
+    .confection-table,
+    .confection-actions {
+        padding: var(--spacing-xl) 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .confection-actions {
+        border-bottom: none;
+    }
+
+    /* Header Info Grid */
+    .info-header-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-item label {
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-xs);
+        font-size: var(--font-size-sm);
+    }
+
+    .form-input {
+        padding: var(--spacing-sm);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        font-size: var(--font-size-base);
+        transition: border-color var(--transition-fast);
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .form-input:read-only {
+        background-color: var(--color-gray-50);
+        color: var(--text-muted);
+    }
+
+    /* Summary Cards */
+    .summary-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    /* Table Controls */
+    .table-controls {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    /* Main Table */
+    .confection-table-container {
+        background: var(--bg-primary);
+        border-radius: var(--border-radius-lg);
+        overflow-x: auto;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        min-width: 1600px; /* 15列対応 */
+    }
+
+    .confection-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-sm);
+    }
+
+    .confection-table th,
+    .confection-table td {
+        padding: var(--spacing-sm);
+        border: 1px solid var(--border-color);
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .confection-table th {
+        background-color: var(--color-gray-100);
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-xs);
+        color: var(--text-primary);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .confection-table tbody tr:nth-child(even) {
+        background-color: var(--color-gray-25);
+    }
+
+    .confection-table tbody tr:hover {
+        background-color: var(--color-secondary-light);
+    }
+
+    /* Category Headers */
+    .category-header {
+        background-color: var(--color-success-light) !important;
+        font-weight: var(--font-weight-bold);
+        color: var(--color-success-dark);
+        text-align: left;
+        padding: var(--spacing-sm) !important;
+    }
+
+    /* Calculated Values */
+    .calculated-value {
+        color: var(--text-muted);
+        background-color: var(--color-gray-50);
+        padding: var(--spacing-xs);
+        border-radius: var(--border-radius-sm);
+        font-weight: var(--font-weight-medium);
+    }
+
+    /* Soldout Time */
+    .soldout-time {
+        color: var(--color-error-dark);
+        font-weight: var(--font-weight-semibold);
+        background-color: var(--color-error-light);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--border-radius-sm);
+    }
+
+    /* Total Row */
+    .total-row {
+        background-color: var(--color-info-light) !important;
+        font-weight: var(--font-weight-bold);
+        border-top: 2px solid var(--color-info);
+    }
+
+    .total-row td {
+        background-color: var(--color-info-light);
+        color: var(--color-info-dark);
+    }
+
+    /* Action Bar */
+    .actions-bar {
+        display: flex;
+        gap: var(--spacing-md);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border: none;
+        border-radius: var(--border-radius-lg);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        text-decoration: none;
+        min-width: 160px;
+        justify-content: center;
+    }
+
+    .btn-primary {
+        background-color: var(--color-secondary);
+        color: var(--color-white);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-secondary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+        background-color: var(--color-gray-100);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-gray-200);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-warning {
+        background-color: var(--color-warning);
+        color: var(--color-white);
+    }
+
+    .btn-warning:hover {
+        background-color: var(--color-warning-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* データダーティ状態の表示 */
+    body.data-dirty .confection-info::before {
+        content: '● 未保存のデータがあります';
+        position: fixed;
+        top: 80px;
+        right: var(--spacing-lg);
+        background: var(--color-warning);
+        color: var(--color-white);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--border-radius-full);
+        font-size: var(--font-size-sm);
+        z-index: var(--z-modal);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .info-header-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .summary-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .table-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .table-controls .btn {
+            width: 100%;
+        }
+
+        .confection-table-container {
+            margin: 0 -var(--spacing-md);
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+        }
+
+        .actions-bar {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .confection-table {
+            font-size: var(--font-size-xs);
+        }
+
+        .confection-table th,
+        .confection-table td {
+            padding: var(--spacing-xs);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .summary-cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .confection-info,
+        .confection-summary,
+        .confection-table,
+        .confection-actions {
+            padding: var(--spacing-md) 0;
+        }
+
+        .container {
+            padding: 0 var(--spacing-sm);
+        }
+
+        .confection-table-container {
+            margin: 0 -var(--spacing-sm);
+        }
+    }
+
+    /* Animation */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .confection-info,
+    .confection-summary,
+    .confection-table {
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    .confection-info { animation-delay: 0.1s; }
+    .confection-summary { animation-delay: 0.2s; }
+    .confection-table { animation-delay: 0.3s; }
+
+    /* Print Styles */
+    @media print {
+        .western-confection-layout {
+            background: white;
+        }
+
+        .confection-actions {
+            display: none;
+        }
+
+        .table-controls {
+            display: none;
+        }
+
+        .confection-table {
+            font-size: 10px;
+        }
+
+        .confection-table th,
+        .confection-table td {
+            padding: 2px;
+            border: 1px solid #000;
+        }
+
+        .btn {
+            display: none;
+        }
+    }
+
+    /* High Contrast Support */
+    @media (prefers-contrast: high) {
+        .confection-table th,
+        .confection-table td {
+            border-color: var(--text-primary);
+        }
+
+        .calculated-value,
+        .soldout-time {
+            border: 1px solid currentColor;
+        }
+    }
+
+    /* Reduced Motion Support */
+    @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .confection-info,
+        .confection-summary,
+        .confection-table {
+            animation: none;
+            transition: none;
+        }
+
+        .btn:hover {
+            transform: none;
+        }
+    }
+    </style>
+</head>
+<body>
+    <!-- Western Confection Note will be mounted here -->
+    <div id="western-root"></div>
+    
+    <!-- Loading indicator -->
+    <div id="western-loading" class="dashboard-loading" style="display: none;">
+        <div class="dashboard-loading-spinner"></div>
+        <div class="dashboard-loading-text">洋生ノートを読み込み中...</div>
+    </div>
+    
+    <!-- Error state -->
+    <div id="western-error" class="dashboard-error" style="display: none;">
+        <div class="dashboard-error-icon">⚠️</div>
+        <div class="dashboard-error-message">洋生ノートの読み込みに失敗しました</div>
+        <button class="dashboard-retry-btn" onclick="initializeWesternConfection()">再試行</button>
+    </div>
+    
+    <!-- Auto-save indicator -->
+    <div id="western-autosave-indicator" class="dashboard-refresh-indicator">
+        💾 洋生ノートを自動保存中...
+    </div>
+    
+    <!-- MOC Core Components -->
+    <script src="src/utils/EventBus.js"></script>
+    <script src="src/stores/AppStore.js"></script>
+    <script src="src/services/InventoryService.js"></script>
+    
+    <!-- MOC UI Components -->
+    <script src="src/components/ui/Card.js"></script>
+    <script src="src/components/ui/Table.js"></script>
+    <script src="src/components/ui/Alert.js"></script>
+    <script src="src/components/ui/Form.js"></script>
+    
+    <!-- MOC Layout Components -->
+    <script src="src/components/layout/Header.js"></script>
+    
+    <!-- MOC Western Confection Note Page -->
+    <script src="src/pages/western/WesternConfectionNote.js"></script>
+    
+    <script>
+        // Global application state
+        let westernConfection = null;
+        let isLoading = false;
+        
+        /**
+         * 洋生ノートシステムの初期化
+         */
+        async function initializeWesternConfection() {
+            if (isLoading) return;
+            
+            try {
+                isLoading = true;
+                showLoading();
+                
+                // WesternConfectionNote instance creation
+                westernConfection = new WesternConfectionNote({
+                    container: '#western-root',
+                    autoSave: true,
+                    saveInterval: 30000 // 30秒
+                });
+                
+                // Initialize western confection system
+                await westernConfection.init();
+                
+                hideLoading();
+                
+                // Setup global event listeners
+                setupGlobalEventListeners();
+                
+                // Debug information
+                console.log('🚀 MOC Western Confection Note initialized successfully');
+                console.log('📊 Components loaded:', {
+                    EventBus: !!window.eventBus,
+                    AppStore: !!window.appStore,
+                    Card: !!window.Card,
+                    Table: !!window.Table,
+                    Alert: !!window.Alert,
+                    Form: !!window.Form,
+                    Header: !!window.Header,
+                    WesternConfectionNote: !!window.WesternConfectionNote
+                });
+                
+            } catch (error) {
+                console.error('Western Confection Note initialization failed:', error);
+                showError();
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        /**
+         * ローディング表示
+         */
+        function showLoading() {
+            document.getElementById('western-loading').style.display = 'flex';
+            document.getElementById('western-error').style.display = 'none';
+            document.getElementById('western-root').style.display = 'none';
+        }
+        
+        /**
+         * ローディング非表示
+         */
+        function hideLoading() {
+            document.getElementById('western-loading').style.display = 'none';
+            document.getElementById('western-root').style.display = 'block';
+        }
+        
+        /**
+         * エラー表示
+         */
+        function showError() {
+            document.getElementById('western-loading').style.display = 'none';
+            document.getElementById('western-error').style.display = 'flex';
+            document.getElementById('western-root').style.display = 'none';
+        }
+        
+        /**
+         * 自動保存インジケーター表示
+         */
+        function showAutoSaveIndicator() {
+            const indicator = document.getElementById('western-autosave-indicator');
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+        
+        /**
+         * グローバルイベントリスナーの設定
+         */
+        function setupGlobalEventListeners() {
+            // Western Confection events
+            if (window.eventBus) {
+                window.eventBus.on('westernConfection.saved', () => {
+                    console.log('🧁 Western confection data saved successfully');
+                    showAutoSaveIndicator();
+                });
+                
+                window.eventBus.on('westernConfection.rowUpdated', (data) => {
+                    console.log('📝 Western confection row updated:', data.column, data.value);
+                });
+                
+                window.eventBus.on('westernConfection.syncToPerformance', (data) => {
+                    console.log('🔄 Western confection data synced to performance system:', data);
+                });
+                
+                // Performance system integration
+                window.eventBus.on('performance.requestWesternData', () => {
+                    console.log('📊 Western confection data requested from performance system');
+                    if (westernConfection) {
+                        const data = westernConfection.getAllData();
+                        window.eventBus.emit('westernConfection.dataProvided', data);
+                    }
+                });
+            }
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + S for manual save
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    if (westernConfection) {
+                        westernConfection.saveData();
+                    }
+                }
+                
+                // Ctrl/Cmd + R for recalculate all
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (westernConfection) {
+                        westernConfection.recalculateAll();
+                    }
+                }
+                
+                // Ctrl/Cmd + N for add product
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                    e.preventDefault();
+                    if (westernConfection) {
+                        westernConfection.addProduct();
+                    }
+                }
+                
+                // Ctrl/Cmd + E for export
+                if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                    e.preventDefault();
+                    if (westernConfection) {
+                        westernConfection.exportToCSV();
+                    }
+                }
+                
+                // F5 for full reload
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    location.reload();
+                }
+            });
+            
+            // Performance monitoring
+            if (window.performance && window.performance.mark) {
+                window.performance.mark('western-confection-ready');
+            }
+            
+            // Page visibility change handling
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && westernConfection) {
+                    // Page became visible, check if auto-save is needed
+                    if (document.body.classList.contains('data-dirty')) {
+                        console.log('👀 Page visible with dirty data, considering save...');
+                    }
+                }
+            });
+            
+            // Before unload warning for unsaved changes
+            window.addEventListener('beforeunload', (e) => {
+                if (document.body.classList.contains('data-dirty')) {
+                    e.preventDefault();
+                    e.returnValue = '未保存の洋生ノートデータがあります。ページを離れますか？';
+                    return e.returnValue;
+                }
+            });
+        }
+        
+        /**
+         * ページ読み込み完了後の初期化
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Performance timing
+            const startTime = performance.now();
+            
+            // Initialize application
+            initializeWesternConfection().then(() => {
+                const endTime = performance.now();
+                console.log(`⚡ Western Confection Note loaded in ${(endTime - startTime).toFixed(2)}ms`);
+                
+                // Welcome message for development
+                if (window.location.search.includes('debug=true')) {
+                    Alert.success('🎉 MOC Western Confection Note loaded successfully!', {
+                        autoClose: 3000
+                    }).mount();
+                }
+            });
+        });
+        
+        /**
+         * Error handling
+         */
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            
+            if (window.Alert) {
+                Alert.error('予期しないエラーが発生しました。データを保存してページを再読み込みしてください。').mount();
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            e.preventDefault();
+        });
+        
+        // Export for debugging
+        if (window.location.search.includes('debug=true')) {
+            window.westernConfection = null; // Will be set after initialization
+            window.mocWesternDebug = {
+                saveData: () => westernConfection?.saveData(),
+                resetData: () => westernConfection?.resetData(),
+                exportCSV: () => westernConfection?.exportToCSV(),
+                addProduct: () => westernConfection?.addProduct(),
+                recalculateAll: () => westernConfection?.recalculateAll(),
+                syncToPerformance: () => westernConfection?.syncToPerformance(),
+                getAllData: () => westernConfection?.getAllData(),
+                getHeaderInfo: () => westernConfection?.headerInfo,
+                getConfectionData: () => westernConfection?.confectionData,
+                showTestAlert: () => Alert.success('Test alert from Western Confection Note').mount(),
+                getStats: () => ({
+                    eventBusStats: window.eventBus?.getStats(),
+                    appStoreDebug: window.appStore?.getDebugInfo(),
+                    isDirty: document.body.classList.contains('data-dirty'),
+                    autoSaveEnabled: westernConfection?.autoSave,
+                    totalProducts: westernConfection?.confectionData?.length || 0
+                })
+            };
+            
+            console.log('🔧 Debug mode enabled. Use window.mocWesternDebug for debugging.');
+        }
+    </script>
+    
+    <!-- Service Worker registration for offline support (optional) -->
+    <script>
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            navigator.serviceWorker.register('/sw.js').then((registration) => {
+                console.log('SW registered: ', registration);
+            }).catch((registrationError) => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        }
+    </script>
+</body>
+</html>

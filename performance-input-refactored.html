@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洋生実績入力＆短日ノート - リファクタリング版</title>
+    
+    <!-- External stylesheets -->
+    <link rel="stylesheet" href="assets/css/common.css">
+    
+    <!-- Page-specific styles -->
+    <style>
+        /* Page-specific styles that don't belong in common.css */
+        .container {
+            max-width: 1400px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        
+        .hourly-sales {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .hourly-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hourly-input label {
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+            color: #2c3e50;
+        }
+        
+        .hourly-input input {
+            width: 60px;
+            padding: 0.3rem;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .expiry-tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .expiry-critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .expiry-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .expiry-safe {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .validation-error {
+            border: 2px solid #dc3545 !important;
+            background-color: #f8d7da !important;
+        }
+        
+        .validation-warning {
+            border: 2px solid #ffc107 !important;
+            background-color: #fff3cd !important;
+        }
+        
+        .validation-success {
+            border: 1px solid #28a745 !important;
+        }
+        
+        .quick-input {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .note-section {
+            margin-top: 2rem;
+        }
+        
+        .note-item {
+            background: #fff9c4;
+            border-left: 4px solid #f39c12;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .note-date {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 洋生実績入力＆短日ノート</h1>
+        <a href="index.html" class="back-btn">← メインメニュー</a>
+    </div>
+    
+    <div class="container">
+        <!-- Quick input section -->
+        <div class="form-section">
+            <h2>⚡ クイック実績入力</h2>
+            <div class="quick-input">
+                <div class="quick-input-grid">
+                    <div class="form-group">
+                        <label>日付</label>
+                        <input type="date" id="quickDate" value="2024-01-15">
+                    </div>
+                    <div class="form-group">
+                        <label>商品コード</label>
+                        <input type="text" id="quickProductCode" placeholder="例: YS001">
+                    </div>
+                    <div class="form-group">
+                        <label>売上数量</label>
+                        <input type="number" id="quickSalesQty" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>単価</label>
+                        <input type="number" id="quickUnitPrice" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label></label>
+                        <button class="btn btn-success" id="addQuickEntry">追加</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Header information -->
+        <div class="form-section">
+            <h2>📅 日次情報設定</h2>
+            <form id="dailyInfoForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>日付</label>
+                        <input type="date" id="businessDate" value="2024-01-15" required>
+                    </div>
+                    <div class="form-group">
+                        <label>客数</label>
+                        <input type="number" id="customerCount" placeholder="60" value="60" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>天気</label>
+                        <select id="weather" required>
+                            <option value="晴れ">晴れ</option>
+                            <option value="曇り">曇り</option>
+                            <option value="雨">雨</option>
+                            <option value="雪">雪</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>気温（℃）</label>
+                        <input type="number" id="temperature" placeholder="15" value="15" min="-20" max="50">
+                    </div>
+                    <div class="form-group">
+                        <label>特招会・イベント</label>
+                        <select id="eventType">
+                            <option value="なし">なし</option>
+                            <option value="特招会">特招会</option>
+                            <option value="セール">セール</option>
+                            <option value="新商品発売">新商品発売</option>
+                            <option value="競合催事">競合催事</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Product performance input table -->
+        <div class="form-section">
+            <h2>📝 商品別実績入力</h2>
+            <div class="mb-1">
+                <button class="btn btn-success" id="addProductBtn">➕ 商品追加</button>
+                <button class="btn btn-primary" id="applyTemplateBtn">📋 テンプレート適用</button>
+                <button class="btn btn-primary" id="autoCalculateBtn">🔄 自動計算</button>
+            </div>
+            
+            <!-- Validation summary container -->
+            <div id="validationSummary"></div>
+            
+            <div class="table-container">
+                <table class="data-table" id="productTable">
+                    <thead>
+                        <tr>
+                            <th>商品コード</th>
+                            <th>商品名</th>
+                            <th>単価</th>
+                            <th>カテゴリ</th>
+                            <th>前日残</th>
+                            <th>当日入庫</th>
+                            <th>移動</th>
+                            <th>販売数</th>
+                            <th>ロス数</th>
+                            <th>当日在庫<br><small>(自動)</small></th>
+                            <th>閉店時在庫</th>
+                            <th>特注</th>
+                            <th>完売時間</th>
+                            <th>売上額</th>
+                            <th>構成比</th>
+                            <th>消費期限</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- Product rows will be dynamically generated -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="productSummary" class="mt-1" style="padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <strong>合計情報:</strong> <span id="summaryText">計算中...</span>
+            </div>
+        </div>
+        
+        <!-- Hourly sales input -->
+        <div class="form-section">
+            <h2>🕐 時間帯別売上入力</h2>
+            <div class="mb-1">
+                <button class="btn btn-success" id="addHourlyBtn">➕ 時間追加</button>
+                <button class="btn btn-primary" id="showChartBtn">📈 グラフ表示</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="hourlyTable">
+                    <thead>
+                        <tr>
+                            <th>時間</th>
+                            <th>売上額</th>
+                            <th>構成比</th>
+                            <th>累計</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hourlyTableBody">
+                        <!-- Hourly data rows will be dynamically generated -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="hourlySummary" class="mt-1" style="padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <strong>時間帯合計:</strong> <span id="hourlyTotalText">¥0 | ピーク時間: なし</span>
+            </div>
+        </div>
+        
+        <!-- Daily notes -->
+        <div class="form-section">
+            <h2>📖 短日ノート</h2>
+            <div class="form-group">
+                <label>今日のメモ・気づき</label>
+                <textarea id="dailyNote" placeholder="本日の売上状況、客層の変化、商品の動向など、気づいたことを記録してください" rows="4"></textarea>
+            </div>
+            
+            <div class="note-section">
+                <h3>過去のノート</h3>
+                <div id="previousNotes">
+                    <!-- Previous notes will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action buttons -->
+        <div class="text-center mb-2">
+            <button class="btn btn-success" id="saveDataBtn">💾 データを保存</button>
+            <button class="btn btn-primary" id="generateReportBtn">📊 日報を生成</button>
+            <button class="btn btn-primary" id="showGraphsBtn">📈 グラフ表示</button>
+        </div>
+    </div>
+    
+    <!-- External JavaScript libraries -->
+    <script src="assets/js/common-utils.js"></script>
+    <script src="assets/js/form-validator.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <script>
+        // Page-specific JavaScript using the refactored utilities
+        class PerformanceInputManager {
+            constructor() {
+                this.validator = new FormValidator();
+                this.productData = [];
+                this.hourlyData = [];
+                
+                this.initializeData();
+                this.setupEventListeners();
+                this.setupValidation();
+            }
+
+            initializeData() {
+                // Initialize with sample data
+                this.productData = [
+                    {
+                        code: 'YS001',
+                        name: 'ショートケーキ',
+                        price: 380,
+                        category: 'ケーキ',
+                        prevStock: 8,
+                        delivery: 35,
+                        movement: 0,
+                        sales: 35,
+                        waste: 2,
+                        eodStock: 6,
+                        special: 3,
+                        soldoutTime: '18:30'
+                    },
+                    {
+                        code: 'YS002',
+                        name: 'チーズケーキ',
+                        price: 420,
+                        category: 'ケーキ',
+                        prevStock: 5,
+                        delivery: 25,
+                        movement: 2,
+                        sales: 28,
+                        waste: 1,
+                        eodStock: 3,
+                        special: 1,
+                        soldoutTime: '19:15'
+                    }
+                ];
+
+                this.hourlyData = [
+                    { time: '09:00-10:00', amount: 3200 },
+                    { time: '10:00-11:00', amount: 4800 },
+                    { time: '11:00-12:00', amount: 7200 },
+                    { time: '14:00-15:00', amount: 9600 }
+                ];
+
+                this.renderTables();
+            }
+
+            setupEventListeners() {
+                const { EventUtils } = window.CommonUtils;
+
+                // Product table events
+                EventUtils.addListener('addProductBtn', 'click', () => this.addProductRow());
+                EventUtils.addListener('autoCalculateBtn', 'click', () => this.calculateAll());
+                
+                // Hourly table events
+                EventUtils.addListener('addHourlyBtn', 'click', () => this.addHourlyRow());
+                
+                // Quick input events
+                EventUtils.addListener('addQuickEntry', 'click', () => this.addQuickEntry());
+                
+                // Save and report events
+                EventUtils.addListener('saveDataBtn', 'click', () => this.saveData());
+                EventUtils.addListener('generateReportBtn', 'click', () => this.generateReport());
+                
+                // Table change events (delegated)
+                document.getElementById('productTableBody').addEventListener('input', (e) => {
+                    if (e.target.tagName === 'INPUT') {
+                        this.handleProductInputChange(e.target);
+                    }
+                });
+
+                document.getElementById('hourlyTableBody').addEventListener('input', (e) => {
+                    if (e.target.tagName === 'INPUT') {
+                        this.calculateHourlyTotals();
+                    }
+                });
+            }
+
+            setupValidation() {
+                // Define validation rules for the form
+                const fieldRules = {
+                    businessDate: ['required'],
+                    customerCount: ['required', 'numeric', 'range'],
+                    temperature: ['numeric', 'range']
+                };
+
+                // Setup real-time validation
+                this.validator.setupRealTimeValidation('dailyInfoForm', fieldRules, {
+                    context: { min: 0, max: 999 },
+                    debounceDelay: 300
+                });
+            }
+
+            renderTables() {
+                this.renderProductTable();
+                this.renderHourlyTable();
+                this.calculateAll();
+            }
+
+            renderProductTable() {
+                const tbody = document.getElementById('productTableBody');
+                tbody.innerHTML = '';
+
+                this.productData.forEach((product, index) => {
+                    const row = this.createProductRow(product, index);
+                    tbody.appendChild(row);
+                });
+            }
+
+            createProductRow(product, index) {
+                const { CalculationUtils } = window.CommonUtils;
+                
+                const row = document.createElement('tr');
+                row.dataset.index = index;
+
+                const currentStock = CalculationUtils.calculateCurrentStock(
+                    product.prevStock, product.delivery, product.movement,
+                    product.sales, product.waste
+                );
+
+                const salesAmount = product.sales * product.price;
+
+                row.innerHTML = `
+                    <td><input type="text" class="product-input" data-field="code" value="${product.code}" style="width: 80px;"></td>
+                    <td><input type="text" class="product-input" data-field="name" value="${product.name}" style="width: 120px;"></td>
+                    <td><input type="number" class="product-input" data-field="price" value="${product.price}" style="width: 80px;"></td>
+                    <td>
+                        <select class="product-input" data-field="category" style="width: 80px;">
+                            <option value="ケーキ" ${product.category === 'ケーキ' ? 'selected' : ''}>ケーキ</option>
+                            <option value="プリン" ${product.category === 'プリン' ? 'selected' : ''}>プリン</option>
+                            <option value="ゼリー" ${product.category === 'ゼリー' ? 'selected' : ''}>ゼリー</option>
+                        </select>
+                    </td>
+                    <td><input type="number" class="product-input" data-field="prevStock" value="${product.prevStock}" style="width: 60px;"></td>
+                    <td><input type="number" class="product-input" data-field="delivery" value="${product.delivery}" style="width: 60px;"></td>
+                    <td><input type="number" class="product-input" data-field="movement" value="${product.movement}" style="width: 60px;"></td>
+                    <td><input type="number" class="product-input" data-field="sales" value="${product.sales}" style="width: 60px;"></td>
+                    <td><input type="number" class="product-input" data-field="waste" value="${product.waste}" style="width: 60px;"></td>
+                    <td class="calculated-field" style="background: #f0f0f0;">${currentStock}</td>
+                    <td><input type="number" class="product-input" data-field="eodStock" value="${product.eodStock}" style="width: 60px;"></td>
+                    <td><input type="number" class="product-input" data-field="special" value="${product.special}" style="width: 60px;"></td>
+                    <td><input type="time" class="product-input" data-field="soldoutTime" value="${product.soldoutTime}" style="width: 80px;"></td>
+                    <td class="calculated-field" style="background: #f0f0f0;">${CalculationUtils.formatCurrency(salesAmount)}</td>
+                    <td class="calculated-field composition-cell" style="background: #f0f0f0;">0.0%</td>
+                    <td><span class="expiry-tag expiry-warning">明日まで</span></td>
+                    <td>
+                        <button class="btn btn-primary copy-btn" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">複製</button>
+                        <button class="btn btn-warning delete-btn" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button>
+                    </td>
+                `;
+
+                // Add event listeners for row buttons
+                row.querySelector('.copy-btn').addEventListener('click', () => this.copyProductRow(index));
+                row.querySelector('.delete-btn').addEventListener('click', () => this.deleteProductRow(index));
+
+                return row;
+            }
+
+            renderHourlyTable() {
+                const tbody = document.getElementById('hourlyTableBody');
+                tbody.innerHTML = '';
+
+                this.hourlyData.forEach((hourly, index) => {
+                    const row = this.createHourlyRow(hourly, index);
+                    tbody.appendChild(row);
+                });
+            }
+
+            createHourlyRow(hourly, index) {
+                const row = document.createElement('tr');
+                row.dataset.index = index;
+
+                row.innerHTML = `
+                    <td>${hourly.time}</td>
+                    <td><input type="number" class="hourly-input" data-field="amount" value="${hourly.amount}" style="width: 100px;"></td>
+                    <td class="calculated-field composition-cell" style="background: #f0f0f0;">0.0%</td>
+                    <td class="calculated-field cumulative-cell" style="background: #f0f0f0;">¥0</td>
+                    <td><button class="btn btn-warning delete-hourly-btn" style="padding: 0.2rem 0.4rem; font-size: 0.7rem;">削除</button></td>
+                `;
+
+                // Add delete event listener
+                row.querySelector('.delete-hourly-btn').addEventListener('click', () => this.deleteHourlyRow(index));
+
+                return row;
+            }
+
+            handleProductInputChange(input) {
+                const { ValidationUtils, CalculationUtils } = window.CommonUtils;
+                
+                const row = input.closest('tr');
+                const index = parseInt(row.dataset.index);
+                const field = input.dataset.field;
+                const value = input.type === 'number' ? parseInt(input.value) || 0 : input.value;
+
+                // Update data model
+                if (this.productData[index]) {
+                    this.productData[index][field] = value;
+                }
+
+                // Perform field-specific validation
+                this.validateProductField(input, row, index);
+                
+                // Recalculate dependent fields
+                this.updateCalculatedFields(row, index);
+                this.calculateProductTotals();
+            }
+
+            validateProductField(input, row, index) {
+                const { ValidationUtils } = window.CommonUtils;
+                const field = input.dataset.field;
+                const product = this.productData[index];
+
+                if (!product) return;
+
+                let validationResult = { isValid: true };
+
+                switch (field) {
+                    case 'waste':
+                        const totalHandled = product.sales + product.waste;
+                        validationResult = ValidationUtils.validateLossRate(product.waste, totalHandled);
+                        break;
+                        
+                    case 'soldoutTime':
+                        validationResult = ValidationUtils.validateTimeFormat(input.value);
+                        break;
+                        
+                    case 'sales':
+                    case 'delivery':
+                    case 'movement':
+                        // Check if stock will go negative
+                        const calculatedStock = CalculationUtils.calculateCurrentStock(
+                            product.prevStock, product.delivery, product.movement,
+                            product.sales, product.waste
+                        );
+                        if (calculatedStock < 0) {
+                            validationResult = {
+                                isValid: false,
+                                level: 'error',
+                                message: '在庫がマイナスになっています'
+                            };
+                        }
+                        break;
+                }
+
+                // Apply validation styling
+                input.classList.remove('validation-error', 'validation-warning', 'validation-success');
+                if (!validationResult.isValid) {
+                    const className = validationResult.level === 'error' ? 'validation-error' : 'validation-warning';
+                    input.classList.add(className);
+                } else {
+                    input.classList.add('validation-success');
+                }
+            }
+
+            updateCalculatedFields(row, index) {
+                const { CalculationUtils } = window.CommonUtils;
+                const product = this.productData[index];
+                
+                if (!product) return;
+
+                // Update current stock
+                const currentStock = CalculationUtils.calculateCurrentStock(
+                    product.prevStock, product.delivery, product.movement,
+                    product.sales, product.waste
+                );
+                
+                const currentStockCell = row.querySelector('.calculated-field:first-of-type');
+                if (currentStockCell) {
+                    currentStockCell.textContent = currentStock;
+                }
+
+                // Update sales amount
+                const salesAmount = product.sales * product.price;
+                const salesAmountCells = row.querySelectorAll('.calculated-field');
+                if (salesAmountCells.length > 1) {
+                    salesAmountCells[1].textContent = CalculationUtils.formatCurrency(salesAmount);
+                }
+            }
+
+            calculateAll() {
+                this.calculateProductTotals();
+                this.calculateHourlyTotals();
+                this.updateValidationSummary();
+            }
+
+            calculateProductTotals() {
+                const { CalculationUtils, DataUtils } = window.CommonUtils;
+                
+                let totalSales = 0;
+                let totalItems = 0;
+                let totalWaste = 0;
+
+                // Calculate totals and update composition percentages
+                this.productData.forEach((product) => {
+                    const salesAmount = product.sales * product.price;
+                    totalSales += salesAmount;
+                    totalItems += product.sales;
+                    totalWaste += product.waste;
+                });
+
+                // Update composition percentages
+                const compositionCells = document.querySelectorAll('.composition-cell');
+                this.productData.forEach((product, index) => {
+                    const salesAmount = product.sales * product.price;
+                    const composition = CalculationUtils.calculateComposition(salesAmount, totalSales);
+                    if (compositionCells[index]) {
+                        compositionCells[index].textContent = composition + '%';
+                    }
+                });
+
+                // Update summary
+                const wasteRate = totalItems + totalWaste > 0 ? 
+                    ((totalWaste / (totalItems + totalWaste)) * 100).toFixed(1) : '0.0';
+
+                const summaryText = `売上額: ${CalculationUtils.formatCurrency(totalSales)} | 総販売数: ${totalItems}個 | 総ロス数: ${totalWaste}個 | ロス率: ${wasteRate}%`;
+                
+                document.getElementById('summaryText').textContent = summaryText;
+            }
+
+            calculateHourlyTotals() {
+                const { CalculationUtils } = window.CommonUtils;
+                
+                let total = 0;
+                let peakAmount = 0;
+                let peakTime = '';
+
+                // Calculate totals from DOM inputs
+                const inputs = document.querySelectorAll('#hourlyTableBody input[data-field="amount"]');
+                const amounts = Array.from(inputs).map(input => parseInt(input.value) || 0);
+                
+                amounts.forEach(amount => total += amount);
+
+                // Update composition and cumulative cells
+                let cumulative = 0;
+                const rows = document.querySelectorAll('#hourlyTableBody tr');
+                
+                rows.forEach((row, index) => {
+                    const amount = amounts[index] || 0;
+                    cumulative += amount;
+
+                    // Track peak time
+                    if (amount > peakAmount) {
+                        peakAmount = amount;
+                        peakTime = row.cells[0].textContent;
+                    }
+
+                    // Update composition
+                    const compositionCell = row.querySelector('.composition-cell');
+                    if (compositionCell) {
+                        const composition = CalculationUtils.calculateComposition(amount, total);
+                        compositionCell.textContent = composition + '%';
+                    }
+
+                    // Update cumulative
+                    const cumulativeCell = row.querySelector('.cumulative-cell');
+                    if (cumulativeCell) {
+                        cumulativeCell.textContent = CalculationUtils.formatCurrency(cumulative);
+                    }
+                });
+
+                // Update summary
+                const summaryText = `${CalculationUtils.formatCurrency(total)} | ピーク時間: ${peakTime} (${CalculationUtils.formatCurrency(peakAmount)})`;
+                document.getElementById('hourlyTotalText').textContent = summaryText;
+            }
+
+            updateValidationSummary() {
+                // Collect all validation results
+                const errors = [];
+                const warnings = [];
+
+                // Check product data for validation issues
+                this.productData.forEach((product, index) => {
+                    const { ValidationUtils } = window.CommonUtils;
+                    
+                    // Loss rate validation
+                    const lossRateResult = ValidationUtils.validateLossRate(product.waste, product.sales + product.waste);
+                    if (!lossRateResult.isValid) {
+                        const entry = { field: `${product.name} ロス率`, message: lossRateResult.message, level: lossRateResult.level };
+                        if (lossRateResult.level === 'error') {
+                            errors.push(entry);
+                        } else {
+                            warnings.push(entry);
+                        }
+                    }
+
+                    // Time format validation
+                    const timeResult = ValidationUtils.validateTimeFormat(product.soldoutTime);
+                    if (!timeResult.isValid) {
+                        errors.push({ field: `${product.name} 完売時間`, message: timeResult.message, level: 'error' });
+                    }
+                });
+
+                // Create validation summary
+                this.displayValidationSummary(errors, warnings);
+            }
+
+            displayValidationSummary(errors, warnings) {
+                const { AlertUtils } = window.CommonUtils;
+                const container = document.getElementById('validationSummary');
+                
+                AlertUtils.clearAlerts('validationSummary');
+
+                if (errors.length === 0 && warnings.length === 0) {
+                    AlertUtils.showAlert('validationSummary', 'success', '✓ 検証完了', 'すべてのデータが正常です。');
+                    return;
+                }
+
+                if (errors.length > 0) {
+                    AlertUtils.showAlert('validationSummary', 'error', '🚨 入力エラー', `${errors.length}件のエラーがあります。`);
+                }
+
+                if (warnings.length > 0) {
+                    AlertUtils.showAlert('validationSummary', 'warning', '⚠️ 注意事項', `${warnings.length}件の警告があります。`);
+                }
+            }
+
+            addProductRow() {
+                const newProduct = {
+                    code: '',
+                    name: '',
+                    price: 0,
+                    category: 'ケーキ',
+                    prevStock: 0,
+                    delivery: 0,
+                    movement: 0,
+                    sales: 0,
+                    waste: 0,
+                    eodStock: 0,
+                    special: 0,
+                    soldoutTime: ''
+                };
+
+                this.productData.push(newProduct);
+                const index = this.productData.length - 1;
+                
+                const tbody = document.getElementById('productTableBody');
+                const row = this.createProductRow(newProduct, index);
+                tbody.appendChild(row);
+                
+                // Focus on the first input of the new row
+                const firstInput = row.querySelector('input');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }
+
+            copyProductRow(index) {
+                const originalProduct = this.productData[index];
+                const copiedProduct = { ...originalProduct };
+                copiedProduct.code = originalProduct.code + '_copy';
+                copiedProduct.name = originalProduct.name + ' (コピー)';
+                
+                this.productData.push(copiedProduct);
+                this.renderProductTable();
+            }
+
+            deleteProductRow(index) {
+                if (this.productData.length <= 1) {
+                    alert('最低1つの商品データが必要です。');
+                    return;
+                }
+                
+                this.productData.splice(index, 1);
+                this.renderProductTable();
+                this.calculateAll();
+            }
+
+            addHourlyRow() {
+                const timeSlots = [
+                    '08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00',
+                    '12:00-13:00', '13:00-14:00', '14:00-15:00', '15:00-16:00',
+                    '16:00-17:00', '17:00-18:00', '18:00-19:00', '19:00-20:00'
+                ];
+                
+                // Find next available time slot
+                const usedTimes = this.hourlyData.map(h => h.time);
+                const availableTime = timeSlots.find(slot => !usedTimes.includes(slot)) || 'カスタム時間';
+                
+                const newHourly = {
+                    time: availableTime,
+                    amount: 0
+                };
+                
+                this.hourlyData.push(newHourly);
+                this.renderHourlyTable();
+            }
+
+            deleteHourlyRow(index) {
+                this.hourlyData.splice(index, 1);
+                this.renderHourlyTable();
+                this.calculateHourlyTotals();
+            }
+
+            addQuickEntry() {
+                const { FormUtils } = window.CommonUtils;
+                
+                const code = FormUtils.getTextValue('quickProductCode');
+                const qty = FormUtils.getNumericValue('quickSalesQty');
+                const price = FormUtils.getNumericValue('quickUnitPrice');
+                
+                if (!code || qty === 0 || price === 0) {
+                    alert('商品コード、数量、単価をすべて入力してください。');
+                    return;
+                }
+                
+                // Find existing product or create new
+                const existingIndex = this.productData.findIndex(p => p.code === code);
+                
+                if (existingIndex >= 0) {
+                    this.productData[existingIndex].sales += qty;
+                    this.productData[existingIndex].price = price;
+                } else {
+                    const newProduct = {
+                        code: code,
+                        name: '商品名を入力',
+                        price: price,
+                        category: 'ケーキ',
+                        prevStock: 0,
+                        delivery: qty,
+                        movement: 0,
+                        sales: qty,
+                        waste: 0,
+                        eodStock: 0,
+                        special: 0,
+                        soldoutTime: ''
+                    };
+                    this.productData.push(newProduct);
+                }
+                
+                // Clear quick input fields
+                FormUtils.setInputValue('quickProductCode', '');
+                FormUtils.setInputValue('quickSalesQty', '');
+                FormUtils.setInputValue('quickUnitPrice', '');
+                
+                this.renderProductTable();
+                this.calculateAll();
+                
+                alert('クイック入力が完了しました。');
+            }
+
+            saveData() {
+                // Validate form first
+                const formValidation = this.validator.validateForm('dailyInfoForm', {
+                    businessDate: ['required'],
+                    customerCount: ['required', 'numeric'],
+                    temperature: ['numeric']
+                });
+
+                if (!formValidation.isValid) {
+                    alert('入力データにエラーがあります。修正してください。');
+                    return;
+                }
+
+                // Save data (in real implementation, this would be an API call)
+                const saveData = {
+                    date: document.getElementById('businessDate').value,
+                    customerCount: parseInt(document.getElementById('customerCount').value),
+                    weather: document.getElementById('weather').value,
+                    temperature: parseInt(document.getElementById('temperature').value),
+                    eventType: document.getElementById('eventType').value,
+                    products: this.productData,
+                    hourly: this.hourlyData,
+                    note: document.getElementById('dailyNote').value
+                };
+
+                // Simulate save
+                console.log('Saving data:', saveData);
+                alert('データが保存されました。');
+            }
+
+            generateReport() {
+                // Generate a summary report
+                const { CalculationUtils } = window.CommonUtils;
+                
+                const totalSales = this.productData.reduce((sum, p) => sum + (p.sales * p.price), 0);
+                const totalWaste = this.productData.reduce((sum, p) => sum + p.waste, 0);
+                const totalSalesQty = this.productData.reduce((sum, p) => sum + p.sales, 0);
+                
+                const report = `
+                    日報 - ${document.getElementById('businessDate').value}
+                    
+                    ■ 基本情報
+                    客数: ${document.getElementById('customerCount').value}名
+                    天気: ${document.getElementById('weather').value}
+                    気温: ${document.getElementById('temperature').value}℃
+                    
+                    ■ 売上実績
+                    総売上額: ${CalculationUtils.formatCurrency(totalSales)}
+                    販売数量: ${totalSalesQty}個
+                    ロス数量: ${totalWaste}個
+                    ロス率: ${totalSalesQty + totalWaste > 0 ? ((totalWaste / (totalSalesQty + totalWaste)) * 100).toFixed(1) : 0}%
+                    
+                    ■ 商品別実績
+                    ${this.productData.map(p => 
+                        `${p.name}: ${p.sales}個 (${CalculationUtils.formatCurrency(p.sales * p.price)})`
+                    ).join('\n')}
+                `;
+                
+                // In real implementation, this would generate a formatted report
+                alert(report);
+            }
+        }
+
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new PerformanceInputManager();
+        });
+    </script>
+</body>
+</html>

@@ -599,6 +599,170 @@
                 flex-direction: column;
             }
         }
+        
+        /* 一括構成比編集モーダル用CSS */
+        .bulk-composition-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+        }
+        
+        .bulk-composition-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .bulk-modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .bulk-modal-header {
+            background: #2196F3;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .bulk-modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .bulk-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .bulk-modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .bulk-modal-body {
+            padding: 1.5rem;
+        }
+        
+        .bulk-composition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .bulk-product-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            background: #f8f9fa;
+        }
+        
+        .bulk-product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.7rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .bulk-product-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        .bulk-product-info {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        .bulk-ratio-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .bulk-ratio-input {
+            width: 80px;
+            padding: 0.4rem;
+            text-align: center;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .bulk-ratio-unit {
+            font-size: 0.85rem;
+            color: #666;
+            min-width: 15px;
+        }
+        
+        .bulk-current-ratio {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.3rem;
+        }
+        
+        .bulk-total-summary {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .bulk-total-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .bulk-total-value.valid { color: #28a745; }
+        .bulk-total-value.warning { color: #ffc107; }
+        .bulk-total-value.error { color: #dc3545; }
+        
+        .bulk-modal-actions {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .bulk-preset-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .bulk-apply-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -625,7 +789,9 @@
             <!-- 月間一括設定 -->
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
                 <h4 style="margin-bottom: 0.5rem;">月間一括設定</h4>
-                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                
+                <!-- 予算設定 -->
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
                     <div>
                         <label for="monthlyBudgetPct">全日予算%:</label>
                         <input type="number" id="monthlyBudgetPct" value="100" min="50" max="150" step="5" style="width: 80px; margin-left: 0.5rem;">
@@ -634,6 +800,19 @@
                     <button class="btn btn-primary" onclick="applyMonthlyBudget()">全日適用</button>
                     <button class="btn btn-secondary" onclick="resetToHQStandard()">HQ基準に戻す</button>
                     <button class="btn btn-secondary" onclick="copyFromPreviousYear()">前年構成をコピー</button>
+                </div>
+                
+                <!-- 商品別構成比一括設定 -->
+                <div style="border-top: 1px solid #eee; padding-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h5 style="margin: 0;">商品別構成比一括設定</h5>
+                        <button class="btn btn-primary" onclick="openBulkCompositionModal()">構成比一括編集</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; font-size: 0.85rem;">
+                        <div id="bulkRatioPreview">
+                            <!-- 商品構成比プレビューが表示される -->
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -685,6 +864,37 @@
         <div class="drawer-actions">
             <button class="btn btn-primary" onclick="saveDrawerChanges()">保存</button>
             <button class="btn btn-secondary" onclick="closeDrawer()">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- 一括構成比編集モーダル -->
+    <div class="bulk-composition-modal" id="bulkCompositionModal">
+        <div class="bulk-modal-content">
+            <div class="bulk-modal-header">
+                <h3>商品別構成比一括設定</h3>
+                <button class="bulk-modal-close" onclick="closeBulkCompositionModal()">×</button>
+            </div>
+            <div class="bulk-modal-body">
+                <div class="bulk-total-summary">
+                    <div>構成比合計</div>
+                    <div class="bulk-total-value" id="bulkTotalRatio">100.0%</div>
+                    <div style="font-size: 0.85rem;">100%に近づけるよう調整してください</div>
+                </div>
+                <div class="bulk-composition-grid" id="bulkCompositionGrid">
+                    <!-- 動的生成 -->
+                </div>
+            </div>
+            <div class="bulk-modal-actions">
+                <div class="bulk-preset-actions">
+                    <button class="btn btn-secondary" onclick="setBulkHQRatios()">HQ基準</button>
+                    <button class="btn btn-secondary" onclick="setBulkPrevYearRatios()">前年構成</button>
+                    <button class="btn btn-secondary" onclick="setBulkEqualRatios()">均等配分</button>
+                </div>
+                <div class="bulk-apply-actions">
+                    <button class="btn btn-secondary" onclick="closeBulkCompositionModal()">キャンセル</button>
+                    <button class="btn btn-primary" onclick="applyBulkCompositionRatios()">全期間に適用</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1835,11 +2045,257 @@
             alert('データ同期機能（実装予定）');
         }
         
+        // 一括構成比編集モーダル関連の変数
+        let bulkCompositionData = {};
+        
+        // 一括構成比編集モーダルを開く
+        function openBulkCompositionModal() {
+            const modal = document.getElementById('bulkCompositionModal');
+            initializeBulkCompositionData();
+            generateBulkCompositionGrid();
+            updateBulkTotalRatio();
+            updateBulkRatioPreview();
+            modal.classList.add('show');
+        }
+        
+        // 一括構成比編集モーダルを閉じる
+        function closeBulkCompositionModal() {
+            const modal = document.getElementById('bulkCompositionModal');
+            modal.classList.remove('show');
+        }
+        
+        // 一括構成比データ初期化
+        function initializeBulkCompositionData() {
+            bulkCompositionData = {};
+            
+            masterProducts.forEach(product => {
+                // 現在設定されている構成比を取得（期間内の最初の日を参考）
+                const sampleDate = currentPeriod.start;
+                const storeRatio = getStoreRatio(sampleDate, product.code);
+                
+                if (storeRatio !== null) {
+                    bulkCompositionData[product.code] = storeRatio * 100;
+                } else {
+                    // 前年構成比を取得
+                    const prevData = getPrevYearData(product.code, sampleDate);
+                    let prevTotalSales = 0;
+                    masterProducts.forEach(p => {
+                        const pd = getPrevYearData(p.code, sampleDate);
+                        prevTotalSales += pd.sales;
+                    });
+                    
+                    if (prevTotalSales > 0) {
+                        const prevRatio = prevData.sales / prevTotalSales;
+                        bulkCompositionData[product.code] = prevRatio * 100;
+                    } else {
+                        // HQ基準を使用
+                        const hqRatio = getHQRatio(product.code);
+                        bulkCompositionData[product.code] = hqRatio * 100;
+                    }
+                }
+            });
+        }
+        
+        // 一括構成比グリッド生成
+        function generateBulkCompositionGrid() {
+            const grid = document.getElementById('bulkCompositionGrid');
+            grid.innerHTML = '';
+            
+            // カテゴリ別にグループ化
+            const categories = ['デンマーク関連', '洋菓子限定', 'ゼリー', 'その他'];
+            
+            categories.forEach(category => {
+                const categoryProducts = masterProducts.filter(p => p.category === category);
+                if (categoryProducts.length === 0) return;
+                
+                categoryProducts.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'bulk-product-card';
+                    
+                    const currentRatio = bulkCompositionData[product.code] || 0;
+                    const hqRatio = getHQRatio(product.code) * 100;
+                    
+                    card.innerHTML = `
+                        <div class="bulk-product-header">
+                            <div>
+                                <div class="bulk-product-name">${product.name}</div>
+                                <div class="bulk-product-info">${product.category} | ¥${product.price.toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="bulk-ratio-input-group">
+                            <input type="number" class="bulk-ratio-input" id="bulk-ratio-${product.code}" 
+                                   value="${currentRatio.toFixed(1)}" step="0.1" min="0" max="50"
+                                   onchange="updateBulkRatio('${product.code}', this.value)">
+                            <span class="bulk-ratio-unit">%</span>
+                        </div>
+                        <div class="bulk-current-ratio">
+                            HQ基準: ${hqRatio.toFixed(1)}%
+                        </div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+            });
+        }
+        
+        // 個別商品の一括構成比更新
+        function updateBulkRatio(productCode, ratioValue) {
+            const ratio = parseFloat(ratioValue) || 0;
+            bulkCompositionData[productCode] = ratio;
+            updateBulkTotalRatio();
+        }
+        
+        // 一括構成比合計更新
+        function updateBulkTotalRatio() {
+            let totalRatio = 0;
+            Object.values(bulkCompositionData).forEach(ratio => {
+                totalRatio += ratio || 0;
+            });
+            
+            const totalElement = document.getElementById('bulkTotalRatio');
+            if (totalElement) {
+                totalElement.textContent = `${totalRatio.toFixed(1)}%`;
+                
+                const diff = Math.abs(totalRatio - 100);
+                if (diff <= 0.5) {
+                    totalElement.className = 'bulk-total-value valid';
+                } else if (diff <= 2.0) {
+                    totalElement.className = 'bulk-total-value warning';
+                } else {
+                    totalElement.className = 'bulk-total-value error';
+                }
+            }
+        }
+        
+        // HQ基準構成比を設定
+        function setBulkHQRatios() {
+            masterProducts.forEach(product => {
+                const hqRatio = getHQRatio(product.code) * 100;
+                bulkCompositionData[product.code] = hqRatio;
+                
+                const inputElement = document.getElementById(`bulk-ratio-${product.code}`);
+                if (inputElement) {
+                    inputElement.value = hqRatio.toFixed(1);
+                }
+            });
+            updateBulkTotalRatio();
+        }
+        
+        // 前年構成比を設定
+        function setBulkPrevYearRatios() {
+            const sampleDate = currentPeriod.start;
+            let prevTotalSales = 0;
+            const prevDataMap = {};
+            
+            // 前年データ収集
+            masterProducts.forEach(product => {
+                const prevData = getPrevYearData(product.code, sampleDate);
+                prevDataMap[product.code] = prevData;
+                prevTotalSales += prevData.sales;
+            });
+            
+            if (prevTotalSales > 0) {
+                masterProducts.forEach(product => {
+                    const prevData = prevDataMap[product.code];
+                    const prevRatio = (prevData.sales / prevTotalSales) * 100;
+                    bulkCompositionData[product.code] = prevRatio;
+                    
+                    const inputElement = document.getElementById(`bulk-ratio-${product.code}`);
+                    if (inputElement) {
+                        inputElement.value = prevRatio.toFixed(1);
+                    }
+                });
+                updateBulkTotalRatio();
+            } else {
+                alert('前年データが不足しているため、HQ基準を使用します');
+                setBulkHQRatios();
+            }
+        }
+        
+        // 均等配分構成比を設定
+        function setBulkEqualRatios() {
+            const equalRatio = 100 / masterProducts.length;
+            
+            masterProducts.forEach(product => {
+                bulkCompositionData[product.code] = equalRatio;
+                
+                const inputElement = document.getElementById(`bulk-ratio-${product.code}`);
+                if (inputElement) {
+                    inputElement.value = equalRatio.toFixed(1);
+                }
+            });
+            updateBulkTotalRatio();
+        }
+        
+        // 一括構成比を全期間に適用
+        function applyBulkCompositionRatios() {
+            // 構成比合計チェック
+            let totalRatio = 0;
+            Object.values(bulkCompositionData).forEach(ratio => {
+                totalRatio += ratio || 0;
+            });
+            
+            const diff = Math.abs(totalRatio - 100);
+            if (diff > 5.0) {
+                if (!confirm(`構成比合計が${totalRatio.toFixed(1)}%です。このまま適用しますか？`)) {
+                    return;
+                }
+            }
+            
+            // 期間内の全日付に適用
+            const datePairs = generateDatePairs();
+            let appliedCount = 0;
+            
+            datePairs.forEach(pair => {
+                masterProducts.forEach(product => {
+                    const ratio = bulkCompositionData[product.code] / 100;
+                    
+                    if (ratio > 0) {
+                        const key = `store_ratio_${pair.current}_${product.code}`;
+                        localStorage.setItem(key, ratio.toString());
+                        appliedCount++;
+                    }
+                });
+            });
+            
+            // 全体再計算
+            calculateAllDays();
+            updateBulkRatioPreview();
+            
+            alert(`${appliedCount}件の構成比設定を全期間に適用しました`);
+            closeBulkCompositionModal();
+        }
+        
+        // 構成比プレビュー更新
+        function updateBulkRatioPreview() {
+            const previewElement = document.getElementById('bulkRatioPreview');
+            if (!previewElement) return;
+            
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem;">';
+            
+            masterProducts.forEach(product => {
+                const sampleDate = currentPeriod.start;
+                const storeRatio = getStoreRatio(sampleDate, product.code);
+                const currentRatio = storeRatio ? (storeRatio * 100).toFixed(1) : '-';
+                
+                html += `
+                    <div style="background: #f8f9fa; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                        <div style="font-weight: 600; font-size: 0.8rem; margin-bottom: 0.2rem;">${product.name}</div>
+                        <div style="color: #2196F3; font-weight: 500;">${currentRatio}%</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            previewElement.innerHTML = html;
+        }
+        
         // 初期計算実行
         setTimeout(() => {
             calculateAllDays();
             showValidationWarnings();
             applyCellValidation();
+            updateBulkRatioPreview();
         }, 100);
     </script>
 </body>
